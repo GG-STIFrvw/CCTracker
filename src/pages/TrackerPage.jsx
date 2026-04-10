@@ -6,6 +6,7 @@ import Navbar from '../components/layout/Navbar.jsx'
 import TrackerSummary from '../components/tracker/TrackerSummary.jsx'
 import TransactionTable from '../components/tracker/TransactionTable.jsx'
 import TransactionForm from '../components/tracker/TransactionForm.jsx'
+import PaymentModal from '../components/tracker/PaymentModal.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 
 export default function TrackerPage() {
@@ -62,6 +63,17 @@ export default function TrackerPage() {
           />
         )}
       </main>
+
+      {payingTransaction && (
+        <PaymentModal
+          transaction={payingTransaction}
+          onClose={() => setPayingTransaction(null)}
+          onSuccess={() => {
+            setPayingTransaction(null)
+            toast('Payment recorded!', 'success')
+          }}
+        />
+      )}
 
       <ToastContainer toasts={toasts} />
     </div>
