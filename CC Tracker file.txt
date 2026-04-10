@@ -1,0 +1,623 @@
+# CC Spending Tracker
+
+## Overview
+
+A secure, high-performance web application that allows users to track credit card spending across multiple cards without exposing sensitive card details. The system focuses on clarity, reliability, and real-time financial visibility.
+
+---
+
+## Core Principles (Non-Negotiable)
+
+* **Security-first architecture**
+* **No sensitive card data stored**
+* **High performance & scalability**
+* **Accurate and reliable financial calculations**
+* **Clean, intentional UI (no clutter / no AI-generated design feel)**
+
+---
+
+## Core Features
+
+### 1. Credit Card Management
+
+* Users can add multiple credit cards
+* Only **bank name** is stored/displayed
+* No card numbers or sensitive financial details
+
+#### Card Visual Representation
+
+* Each card appears as a **UI card component** on the dashboard
+* Customizable fields:
+
+  * Card nickname
+  * Cardholder name (display only)
+  * Expiry date (display only)
+  * Mock card number (non-sensitive, masked/static format)
+
+#### Bank Color Themes
+
+* SBC: `#99c044`, `#00a1d3`
+* EastWest: `#6d288e`, `#d5e04d`
+* BPI: `#b11116`, `#dcb91c`
+
+---
+
+### 2. Spending Tracker (Per Card)
+
+Each card has its own tracker.
+
+#### Tracker Table
+
+Columns:
+
+* Transaction ID
+* Transaction Date
+* Amount
+* Payment Due Date
+* Payment Status (Unpaid / Partially Paid / Paid)
+* Amount Paid
+* Remaining Balance
+* Notes (optional)
+* Created At / Updated At
+
+#### Functional Behavior
+
+* Automatic summation of total expenses
+* Real-time update of totals when:
+
+  * Transactions are added
+  * Payments are recorded
+
+---
+
+### 3. Spending Limit Bar
+
+* Visual progress bar per card:
+
+  * Example: `700,000 / 1,000,000`
+
+#### Behavior
+
+* Updates in real-time
+* Reflects **net outstanding balance**, not just total spend
+* Color-coded based on bank theme
+
+#### Suggested Enhancements
+
+* Threshold indicators:
+
+  * 50% = neutral
+  * 75% = warning
+  * 90%+ = critical
+* Smooth animation for updates
+
+---
+
+### 4. Payments System
+
+* Users can record payments against transactions
+
+#### Payment Features
+
+* Partial payments supported
+* Full payment marking
+* Payment history log per transaction
+
+#### Behavior
+
+* Reduces outstanding balance
+* Updates tracker totals
+* Updates spending bar dynamically
+
+---
+
+### 5. Sharing System
+
+* Users can share a tracker via **secure alphanumeric code**
+
+#### Requirements
+
+* Code is:
+
+  * Unique
+  * Time-bound (recommended)
+  * Revocable
+
+#### Permissions (Suggested)
+
+* View-only access
+* Editable access (optional toggle)
+
+---
+
+### 6. Authentication System
+
+#### Sign Up
+
+* Email + password
+* 6-digit OTP via email verification
+
+#### Login Options
+
+* Email/password
+* Google OAuth
+
+#### Account Recovery
+
+* Forgot password flow
+* OTP-based reset
+
+---
+
+## UI/UX Design
+
+### Dashboard
+
+* Displays all card trackers as **card-like components**
+* Each card includes:
+
+  * Card design (based on bank colors)
+  * Spending bar
+  * Quick stats:
+
+    * Total spent
+    * Remaining balance
+
+### Interaction
+
+* Clicking a card → opens detailed tracker view
+
+### Tracker View
+
+* Table-based layout
+* Sticky summary header:
+
+  * Total spent
+  * Total paid
+  * Remaining balance
+
+---
+
+## Security Requirements (Critical)
+
+### Data Protection
+
+* No storage of:
+
+  * Real card numbers
+  * CVV
+  * Billing details
+
+### Backend Security
+
+* Encrypted database (at rest)
+* HTTPS only
+* Secure API authentication (JWT or session-based)
+
+### OTP Security
+
+* Expiration (e.g., 5 minutes)
+* Rate limiting
+
+### Sharing Security
+
+* Token-based access
+* Optional expiration & revocation
+
+---
+
+## Performance & Scalability
+
+### Requirements
+
+* Fast load times (<200ms API responses target)
+* Optimized database queries
+* Pagination for large datasets
+
+### Suggested Architecture
+
+* Modular backend (services-based)
+* Caching layer (for dashboard summaries)
+* Async processing for heavy operations
+
+---
+
+## Data Integrity & Reliability
+
+### Financial Accuracy
+
+* Use precise numeric handling (avoid float errors)
+* Immutable transaction logs (recommended)
+
+### Auditability (Suggested)
+
+* Track all changes:
+
+  * Edits
+  * Payments
+  * Deletions
+
+---
+
+## Additional Recommended Features (High Value)
+
+### 1. Alerts & Notifications
+
+* Payment due reminders
+* Spending threshold alerts
+
+### 2. Multi-Currency Support (Future)
+
+* If user has cards in different currencies
+
+### 3. Export Options
+
+* CSV / Excel export of transactions
+
+### 4. Analytics Dashboard
+
+* Monthly spending trends
+* Category breakdown (if categories added later)
+
+### 5. Categories (Optional Enhancement)
+
+* Food, Bills, Shopping, etc.
+
+### 6. Dark Mode
+
+* Clean UI toggle
+
+### 7. Mobile Responsiveness
+
+* Priority for mobile-first usability
+
+---
+
+## Open Questions / Clarifications Needed
+
+* Should users be able to delete transactions or only archive them?
+
+  * **Answer:** Archive only
+  * Rationale: Preserves auditability and prevents accidental data loss. Archived items are excluded from active calculations but remain retrievable.
+
+* Should sharing allow multiple collaborators?
+
+  * **Answer:** Yes, if the owner allows it
+
+* Is offline support required?
+
+  * **Answer:** No
+
+* Should there be role-based permissions in shared trackers?
+
+  * **Answer:** Yes (defined below)
+
+### Role-Based Permissions (Detailed)
+
+To maintain security and data integrity while enabling collaboration, implement the following roles:
+
+#### 1. Owner
+
+* Full control over the tracker
+* Capabilities:
+
+  * Add/edit/archive transactions
+  * Record payments
+  * Manage collaborators
+  * Set permissions
+  * Revoke access
+  * Delete/archive tracker
+
+#### 2. Editor (Collaborator)
+
+* Can actively manage financial data
+* Capabilities:
+
+  * Add transactions
+  * Edit transactions
+  * Record payments
+  * View all data
+* Restrictions:
+
+  * Cannot delete/archive tracker
+  * Cannot manage permissions (unless explicitly allowed via advanced toggle)
+
+#### 3. Viewer
+
+* Read-only access
+* Capabilities:
+
+  * View transactions
+  * View spending bar and summaries
+* Restrictions:
+
+  * No edits
+  * No payments
+
+#### Permission Controls
+
+* Owner can:
+
+  * Assign roles per collaborator
+  * Toggle whether Editors can:
+
+    * Edit existing entries
+    * Only add new entries (restricted mode)
+  * Set link/code access to:
+
+    * Single-use
+    * Time-limited
+    * Domain/email-restricted (optional future feature)
+
+#### Audit & Safety Enhancements
+
+* Maintain an **activity log**:
+
+  * Who added/edited transactions
+  * Who recorded payments
+  * Timestamped changes
+* Optional: soft-lock mechanism
+
+  * Prevent edits after a billing cycle is closed
+
+---
+
+## Future Considerations
+
+* Native mobile app
+* Bank integrations (read-only APIs, if ever considered)
+* AI insights (strictly optional and must not compromise credibility)
+
+---
+
+## Tech Stack Recommendation
+
+This stack is chosen for **security, performance, scalability, and long-term maintainability** — avoiding over-engineering while remaining production-grade.
+
+### Frontend
+
+* **Framework:** Next.js (React)
+
+  * SSR + CSR hybrid for performance
+  * Optimized routing and SEO (if needed later)
+
+* **Styling:** Tailwind CSS
+
+  * Utility-first, consistent design system
+  * Easy theming for bank colors
+
+* **State Management:**
+
+  * React Query (server state)
+  * Zustand (lightweight client state)
+
+* **Forms & Validation:**
+
+  * React Hook Form
+  * Zod (schema validation)
+
+---
+
+### Backend
+
+* **Runtime:** Node.js
+
+* **Framework:** NestJS
+
+  * Structured, scalable, modular architecture
+  * Built-in support for validation, guards, interceptors
+
+* **API Style:** REST (clean, predictable)
+
+---
+
+### Database
+
+* **Primary DB:** PostgreSQL
+
+  * Strong consistency (important for financial data)
+  * Supports transactions & constraints
+
+* **ORM:** Prisma
+
+  * Type-safe queries
+  * Migration system
+
+---
+
+### Authentication
+
+* Email + OTP (custom implementation)
+
+* Google OAuth (via OAuth provider)
+
+* **Session Handling:**
+
+  * JWT (short-lived) + Refresh Tokens
+
+---
+
+### Infrastructure
+
+* **Hosting:**
+
+  * Vercel (frontend)
+  * AWS / Railway / Render (backend)
+
+* **Database Hosting:**
+
+  * Supabase / Neon (Postgres managed)
+
+* **Storage (if needed later):**
+
+  * AWS S3
+
+---
+
+### Security Layer
+
+* HTTPS enforced
+* Rate limiting (login, OTP, sharing)
+* Input validation (Zod + backend validation)
+* RBAC (role-based access control)
+* Encrypted environment variables
+
+---
+
+### Real-Time / Sync (Optional Enhancement)
+
+* WebSockets (via NestJS gateway) OR
+* Polling via React Query
+
+---
+
+### Email System
+
+* Resend / SendGrid
+
+  * OTP delivery
+  * Notifications (future)
+
+---
+
+### Monitoring & Reliability
+
+* Logging: Pino / Winston
+* Error Tracking: Sentry
+* Metrics (future): Prometheus + Grafana
+
+---
+
+### Testing
+
+* Unit Tests: Jest
+* Integration Tests: Supertest
+* E2E: Playwright
+
+---
+
+### DevOps
+
+* CI/CD: GitHub Actions
+* Docker (optional but recommended for backend)
+
+---
+
+### Why This Stack?
+
+* **PostgreSQL over NoSQL** → financial accuracy + relational integrity
+* **NestJS over Express** → structure prevents messy scaling
+* **Prisma** → reduces query bugs
+* **React Query** → avoids stale financial data issues
+* **Zod** → ensures strict validation (critical for money-related inputs)
+
+---
+
+## Budget & Free Tier Strategy
+
+This project is designed to run on **$0 budget for MVP**, with clear expectations on limitations.
+
+### Free Stack Mapping
+
+#### Frontend
+
+* Next.js + Tailwind → Free
+* Hosting: Vercel (free tier)
+
+#### Backend
+
+* NestJS (Node.js) → Free
+* Hosting: Render / Railway (free tier)
+
+#### Database
+
+* PostgreSQL via Supabase / Neon (free tier)
+
+#### Authentication & Email
+
+* Custom email + OTP logic
+* Email provider: Resend / SendGrid (free tier)
+
+#### Monitoring
+
+* Sentry (free tier)
+
+---
+
+### Known Free Tier Limitations
+
+#### 1. Cold Starts
+
+* Backend services may sleep when inactive
+* First request latency: ~2–10 seconds
+
+Mitigation:
+
+* Use frontend caching
+* Optimize API calls
+
+#### 2. Email Limits
+
+* OTP sending is limited per day
+
+Mitigation:
+
+* Rate limit OTP requests
+* Add cooldown timers
+
+#### 3. Database Constraints
+
+* Limited storage (~500MB–1GB typical)
+* Limited connections
+
+Mitigation:
+
+* Efficient schema design
+* Avoid unnecessary logs
+
+#### 4. No SLA / Reliability Guarantees
+
+* Free services may experience downtime
+
+---
+
+### Recommended Strategy
+
+#### Phase 1: MVP (100% Free)
+
+* Validate product
+* Build core features only
+
+#### Phase 2: Early Users ($5–$20/month)
+
+* Upgrade backend to always-on
+* Increase email limits
+
+---
+
+### Reality Check
+
+Free tier allows:
+
+* Clean UI/UX
+* Secure architecture
+* Functional product
+
+Free tier does NOT guarantee:
+
+* Zero latency
+* High reliability under load
+* Enterprise-grade uptime
+
+---
+
+## Summary
+
+This product is a **secure, minimal, and high-performance credit card tracking system** that prioritizes:
+
+* Data privacy
+* Financial accuracy
+* Clean UX
+* Real-time updates
+
+The goal is to deliver a tool that feels **trustworthy, fast, and intentional**, not experimental or bloated.
