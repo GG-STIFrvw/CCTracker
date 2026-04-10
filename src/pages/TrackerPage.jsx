@@ -5,6 +5,7 @@ import { useTransactions } from '../hooks/useTransactions.js'
 import Navbar from '../components/layout/Navbar.jsx'
 import TrackerSummary from '../components/tracker/TrackerSummary.jsx'
 import TransactionTable from '../components/tracker/TransactionTable.jsx'
+import TransactionForm from '../components/tracker/TransactionForm.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 
 export default function TrackerPage() {
@@ -46,13 +47,10 @@ export default function TrackerPage() {
           ← Back to Dashboard
         </button>
 
-        {/* TransactionForm will be wired in Task 13 */}
-        <div
-          id="transaction-form-placeholder"
-          className="bg-gray-900 border border-dashed border-gray-600 rounded-xl p-4 mb-6 text-gray-500 text-sm text-center"
-        >
-          Transaction form loading…
-        </div>
+        <TransactionForm
+          cardId={cardId}
+          onSuccess={() => toast('Transaction added!', 'success')}
+        />
 
         {isLoading ? (
           <p className="text-gray-500 text-center py-10">Loading transactions…</p>
