@@ -12,22 +12,22 @@ function formatDate(dateStr) {
   })
 }
 
-export default function TransactionTable({ transactions, cardId, onPay }) {
+export default function TransactionTable({ transactions, cardId, onPay, readOnly = false }) {
   const archive = useArchiveTransaction()
 
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500 border border-dashed border-gray-700 rounded-xl">
+      <div className="text-center py-16 text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
         No transactions yet. Add your first one above.
       </div>
     )
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-700">
+    <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-800 text-gray-400 text-xs uppercase tracking-wide">
+          <tr className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
             <th className="px-4 py-3 text-left whitespace-nowrap">Date</th>
             <th className="px-4 py-3 text-right whitespace-nowrap">Amount</th>
             <th className="px-4 py-3 text-left whitespace-nowrap">Due Date</th>
@@ -35,54 +35,58 @@ export default function TransactionTable({ transactions, cardId, onPay }) {
             <th className="px-4 py-3 text-right whitespace-nowrap">Remaining</th>
             <th className="px-4 py-3 text-center whitespace-nowrap">Status</th>
             <th className="px-4 py-3 text-left">Notes</th>
-            <th className="px-4 py-3 text-center whitespace-nowrap">Actions</th>
+            {!readOnly && (
+              <th className="px-4 py-3 text-center whitespace-nowrap">Actions</th>
+            )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-800">
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.map((t) => (
-            <tr key={t.id} className="hover:bg-gray-800/50 transition-colors text-gray-200">
+            <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-gray-700 dark:text-gray-200">
               <td className="px-4 py-3 whitespace-nowrap">{formatDate(t.transaction_date)}</td>
               <td className="px-4 py-3 text-right font-mono">{formatPeso(t.amount)}</td>
-              <td className="px-4 py-3 whitespace-nowrap text-gray-400">
+              <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400">
                 {formatDate(t.payment_due_date)}
               </td>
-              <td className="px-4 py-3 text-right font-mono text-green-400">
+              <td className="px-4 py-3 text-right font-mono text-green-600 dark:text-green-400">
                 {formatPeso(t.amount_paid)}
               </td>
-              <td className="px-4 py-3 text-right font-mono text-red-400">
+              <td className="px-4 py-3 text-right font-mono text-red-600 dark:text-red-400">
                 {formatPeso(getRemainingBalance(t.amount, t.amount_paid))}
               </td>
               <td className="px-4 py-3 text-center">
                 <Badge status={t.payment_status} />
               </td>
-              <td className="px-4 py-3 text-gray-400 max-w-[150px] truncate">
+              <td className="px-4 py-3 text-gray-500 dark:text-gray-400 max-w-[150px] truncate">
                 {t.notes || '—'}
               </td>
-              <td className="px-4 py-3 text-center">
-                <div className="flex gap-2 justify-center items-center">
-                  {t.payment_status !== 'paid' && (
-                    <Button
-                      variant="ghost"
-                      className="text-xs py-1 px-2"
-                      onClick={() => onPay(t)}
+              {!readOnly && (
+                <td className="px-4 py-3 text-center">
+                  <div className="flex gap-2 justify-center items-center">
+                    {t.payment_status !== 'paid' && (
+                      <Button
+                        variant="ghost"
+                        className="text-xs py-1 px-2"
+                        onClick={() => onPay(t)}
+                      >
+                        Pay
+                      </Button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (confirm('Archive this transaction? It will no longer appear in your tracker.')) {
+                          archive.mutate({ id: t.id, cardId })
+                        }
+                      }}
+                      className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
+                      title="Archive transaction"
+                      disabled={archive.isPending}
                     >
-                      Pay
-                    </Button>
-                  )}
-                  <button
-                    onClick={() => {
-                      if (confirm('Archive this transaction? It will no longer appear in your tracker.')) {
-                        archive.mutate({ id: t.id, cardId })
-                      }
-                    }}
-                    className="text-gray-600 hover:text-red-400 text-xs transition-colors"
-                    title="Archive transaction"
-                    disabled={archive.isPending}
-                  >
-                    Archive
-                  </button>
-                </div>
-              </td>
+                      Archive
+                    </button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -7,15 +7,15 @@ import Button from '../ui/Button.jsx'
 function Field({ label, error, children }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-gray-400">{label}</label>
+      <label className="text-xs text-gray-500 dark:text-gray-400">{label}</label>
       {children}
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
     </div>
   )
 }
 
 const inputCls =
-  'bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 w-full transition-colors'
+  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 w-full transition-colors'
 
 export default function TransactionForm({ cardId, onSuccess }) {
   const addTransaction = useAddTransaction()
@@ -48,9 +48,9 @@ export default function TransactionForm({ cardId, onSuccess }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="bg-gray-900 border border-gray-700 rounded-xl p-4"
+      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4"
     >
-      <h3 className="text-white font-semibold mb-4 text-sm">Add Transaction</h3>
+      <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-sm">Add Transaction</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Field label="Date" error={errors.transaction_date?.message}>
           <input type="date" className={inputCls} {...register('transaction_date')} />
@@ -80,7 +80,7 @@ export default function TransactionForm({ cardId, onSuccess }) {
 
       <div className="flex items-center justify-between mt-4">
         {addTransaction.isError && (
-          <p className="text-red-400 text-xs">{addTransaction.error?.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-xs">{addTransaction.error?.message}</p>
         )}
         <div className="ml-auto">
           <Button type="submit" disabled={addTransaction.isPending}>

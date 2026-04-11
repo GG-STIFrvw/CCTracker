@@ -14,7 +14,7 @@ function formatDateTime(dt) {
 }
 
 const inputCls =
-  'bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm w-full focus:outline-none focus:border-blue-500 transition-colors'
+  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm w-full focus:outline-none focus:border-blue-500 transition-colors'
 
 export default function PaymentModal({ transaction, onClose, onSuccess }) {
   const remaining = getRemainingBalance(transaction.amount, transaction.amount_paid)
@@ -47,30 +47,30 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
   return (
     <Modal title="Record Payment" onClose={onClose}>
       {/* Transaction summary */}
-      <div className="bg-gray-800 rounded-lg p-3 mb-4 grid grid-cols-2 gap-3 text-sm">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 mb-4 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <p className="text-gray-400 text-xs mb-0.5">Original Amount</p>
-          <p className="text-white font-mono">{formatPeso(transaction.amount)}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">Original Amount</p>
+          <p className="text-gray-900 dark:text-white font-mono">{formatPeso(transaction.amount)}</p>
         </div>
         <div>
-          <p className="text-gray-400 text-xs mb-0.5">Already Paid</p>
-          <p className="text-green-400 font-mono">{formatPeso(transaction.amount_paid)}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">Already Paid</p>
+          <p className="text-green-600 dark:text-green-400 font-mono">{formatPeso(transaction.amount_paid)}</p>
         </div>
-        <div className="col-span-2 pt-1 border-t border-gray-700">
-          <p className="text-gray-400 text-xs mb-0.5">Remaining Balance</p>
-          <p className="text-red-400 font-mono font-bold text-lg">{formatPeso(remaining)}</p>
+        <div className="col-span-2 pt-1 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">Remaining Balance</p>
+          <p className="text-red-600 dark:text-red-400 font-mono font-bold text-lg">{formatPeso(remaining)}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
         {recordPayment.isError && (
-          <p className="bg-red-900/40 border border-red-700 text-red-300 text-xs rounded-lg px-3 py-2">
+          <p className="bg-red-50 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-300 text-xs rounded-lg px-3 py-2">
             {recordPayment.error?.message}
           </p>
         )}
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">Payment Amount (PHP)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400">Payment Amount (PHP)</label>
           <input
             type="number"
             step="0.01"
@@ -80,11 +80,11 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
             {...register('amount')}
           />
           {errors.amount && (
-            <p className="text-red-400 text-xs">{errors.amount.message}</p>
+            <p className="text-red-500 dark:text-red-400 text-xs">{errors.amount.message}</p>
           )}
           <button
             type="button"
-            className="text-blue-400 text-xs text-left hover:underline mt-0.5"
+            className="text-blue-600 dark:text-blue-400 text-xs text-left hover:underline mt-0.5"
             onClick={() => setValue('amount', remaining.toString())}
           >
             Pay full remaining ({formatPeso(remaining)})
@@ -92,7 +92,7 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-400">Notes (optional)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400">Notes (optional)</label>
           <input
             type="text"
             placeholder="Bank transfer, GCash…"
@@ -113,20 +113,20 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
 
       {/* Payment history */}
       {history.length > 0 && (
-        <div className="mt-4 border-t border-gray-700 pt-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+        <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
             Payment History
           </p>
           <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
             {history.map((p) => (
               <div key={p.id} className="flex justify-between items-start text-sm gap-2">
                 <div>
-                  <span className="text-gray-300">{formatDateTime(p.paid_at)}</span>
+                  <span className="text-gray-700 dark:text-gray-300">{formatDateTime(p.paid_at)}</span>
                   {p.notes && (
-                    <p className="text-gray-500 text-xs">{p.notes}</p>
+                    <p className="text-gray-500 dark:text-gray-500 text-xs">{p.notes}</p>
                   )}
                 </div>
-                <span className="text-green-400 font-mono flex-shrink-0">
+                <span className="text-green-600 dark:text-green-400 font-mono flex-shrink-0">
                   {formatPeso(p.amount)}
                 </span>
               </div>

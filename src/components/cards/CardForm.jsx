@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cardSchema } from '../../lib/zod-schemas.js'
@@ -6,18 +7,19 @@ import { useAddCard, useUpdateCard, useDeleteCard } from '../../hooks/useCards.j
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
 
-function InputField({ label, error, ...props }) {
+const InputField = forwardRef(function InputField({ label, error, ...props }, ref) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-gray-400">{label}</label>
+      <label className="text-xs text-gray-500 dark:text-gray-400">{label}</label>
       <input
-        className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+        ref={ref}
+        className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
         {...props}
       />
-      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
     </div>
   )
-}
+})
 
 export default function CardForm({ card, onClose, onSuccess }) {
   const isEdit = !!card?.id
@@ -84,7 +86,7 @@ export default function CardForm({ card, onClose, onSuccess }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
         {mutationError && (
-          <p className="bg-red-900/40 border border-red-700 text-red-300 text-xs rounded-lg px-3 py-2">
+          <p className="bg-red-50 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-300 text-xs rounded-lg px-3 py-2">
             {mutationError.message}
           </p>
         )}

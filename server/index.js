@@ -32,15 +32,16 @@ app.post('/api/notify', async (req, res) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
+      service: 'gmail',
       auth: { user, pass },
+      tls: { rejectUnauthorized: false },
     })
+    console.log('[email] sending to', to)
     await transporter.sendMail({ from: `"CC Tracker" <${user}>`, to, subject, html })
+    console.log('[email] sent ok')
     res.json({ ok: true })
   } catch (e) {
-    console.error('[email]', e.message)
+    console.error('[email] ERROR:', e.message)
     res.status(500).json({ error: e.message })
   }
 })
