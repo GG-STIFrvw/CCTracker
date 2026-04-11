@@ -7,6 +7,9 @@ import { useCards } from '../hooks/useCards.js'
 import useAppStore from '../store/useAppStore.js'
 import Button from '../components/ui/Button.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
+import BorrowerTile from '../components/borrowers/BorrowerTile.jsx'
+import BorrowerForm from '../components/borrowers/BorrowerForm.jsx'
+import { useBorrowers } from '../hooks/useBorrowers.js'
 
 export default function DashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -15,6 +18,9 @@ export default function DashboardPage() {
   const [editingCard, setEditingCard] = useState(null)
   const [showShare, setShowShare] = useState(false)
   const { toasts, toast } = useToast()
+  const { data: borrowers = [], isLoading: loadingBorrowers } = useBorrowers()
+  const [showAddBorrower, setShowAddBorrower] = useState(false)
+  const [editingBorrower, setEditingBorrower] = useState(null)
 
   // Only show cards owned by this user on the dashboard
   const ownCards = cards.filter((c) => c.user_id === user?.id)
@@ -69,6 +75,40 @@ export default function DashboardPage() {
             />
           ))}
         </div>
+
+        {/* Borrowers section */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">My Borrowers</h2>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-0.5">
+                {borrowers.length} borrower{borrowers.length !== 1 ? 's' : ''} tracked
+              </p>
+            </div>
+            <Button onClick={() => setShowAddBorrower(true)}>+ Add Borrower</Button>
+          </div>
+
+          {loadingBorrowers && (
+            <div className="text-gray-500 text-center py-10">Loading borrowers…</div>
+          )}
+
+          {!loadingBorrowers && borrowers.length === 0 && (
+            <div className="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
+              <div className="text-4xl mb-3">🤝</div>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">No borrowers yet</p>
+              <p className="text-gray-500 text-sm mt-1 mb-5">
+                Track money you lend to friends or family
+              </p>
+              <Button onClick={() => setShowAddBorrower(true)}>+ Add Your First Borrower</Button>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {borrowers.map((b) => (
+              <BorrowerTile key={b.id} borrower={b} onEdit={(b) => setEditingBorrower(b)} />
+            ))}
+          </div>
+        </div>
       </main>
 
       {showAdd && (
@@ -87,6 +127,20 @@ export default function DashboardPage() {
       )}
 
       {showShare && <ShareManagerModal onClose={() => setShowShare(false)} />}
+
+      {showAddBorrower && (
+        <BorrowerForm
+          onClose={() => setShowAddBorrower(false)}
+          onSuccess={() => toast('Borrower added!', 'success')}
+        />
+      )}
+      {editingBorrower && (
+        <BorrowerForm
+          borrower={editingBorrower}
+          onClose={() => setEditingBorrower(null)}
+          onSuccess={() => toast('Borrower updated!', 'success')}
+        />
+      )}
 
       <ToastContainer toasts={toasts} />
     </div>

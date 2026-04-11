@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import TrackerPage from './pages/TrackerPage.jsx'
 import SharedWithMePage from './pages/SharedWithMePage.jsx'
+import LoanPage from './pages/LoanPage.jsx'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 30 } },
@@ -93,6 +94,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <TrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/borrower/:borrowerId"
+            element={
+              <ProtectedRoute>
+                <LoanPage />
               </ProtectedRoute>
             }
           />

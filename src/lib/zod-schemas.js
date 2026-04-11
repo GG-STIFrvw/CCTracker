@@ -47,3 +47,51 @@ export const paymentSchema = z.object({
     .positive('Amount must be greater than 0'),
   notes: z.string().optional(),
 })
+
+export const borrowerSchema = z.object({
+  full_name: z.string().min(1, 'Full name is required'),
+  address: z.string().min(1, 'Address is required'),
+  phone: z.string().min(1, 'Phone is required'),
+  email: z.string().email('Invalid email address'),
+})
+
+export const loanSchema = z
+  .object({
+    amount: z.coerce
+      .number({ invalid_type_error: 'Must be a number' })
+      .positive('Amount must be greater than 0'),
+    loan_date: z.string().min(1, 'Loan date is required'),
+    description: z.string().optional(),
+    payment_frequency: z.enum(['one-time', 'weekly', 'monthly']),
+    payment_day: z.coerce.number().optional().nullable(),
+    next_payment_date: z.string().optional().nullable(),
+    notarized: z.boolean().default(false),
+    lawyer_name: z.string().optional().nullable(),
+    ptr_number: z.string().optional().nullable(),
+    date_notarized: z.string().optional().nullable(),
+  })
+  .refine(
+    (d) => {
+      if (d.payment_frequency === 'monthly') {
+        return d.payment_day === 15 || d.payment_day === 30
+      }
+      return true
+    },
+    { message: 'Payment day must be 15 or 30 for monthly frequency', path: ['payment_day'] }
+  )
+  .refine(
+    (d) => {
+      if (d.notarized) {
+        return !!d.lawyer_name && !!d.ptr_number && !!d.date_notarized
+      }
+      return true
+    },
+    { message: 'Lawyer name, PTR number, and date notarized are required when notarized', path: ['lawyer_name'] }
+  )
+
+export const loanPaymentSchema = z.object({
+  amount: z.coerce
+    .number({ invalid_type_error: 'Must be a number' })
+    .positive('Amount must be greater than 0'),
+  notes: z.string().optional(),
+})
