@@ -48,7 +48,6 @@ Users can add cards, log transactions, record payments, and share cards with oth
 - Email/password login, register, forgot password
 - Google OAuth (sign in with Google)
 - Auth guard on all protected routes
-- OAuth redirect fixed (was looping back to localhost — fixed by setting Supabase Site URL to Vercel URL)
 
 ### Dashboard
 - Shows all cards owned by the logged-in user
@@ -56,6 +55,7 @@ Users can add cards, log transactions, record payments, and share cards with oth
 - Edit card modal
 - Delete card with inline confirmation UI (no browser alert)
 - Share button → opens ShareManagerModal
+- **My Borrowers section** — borrower tiles with initials avatar, totals, progress bar, overdue badge
 
 ### Card Tile
 - Displays bank, nickname, cardholder, last 4 digits, expiry
@@ -64,13 +64,9 @@ Users can add cards, log transactions, record payments, and share cards with oth
 
 ### Tracker Page
 - Sticky summary header: Total Charged, Total Paid, Outstanding
-- Add Transaction form with fields: Date, Amount (PHP), Payment Due Date, Notes
-  - Date capped at today — future dates blocked (both `max` attr and Zod validation)
-  - Amount validated against available credit (spending_limit minus outstanding) — shows error if exceeded
-- Transaction table with columns: Date, Amount, Due Date, Paid, Remaining, Status, Notes, Actions
-  - **Pay** button → opens Payment Modal
-  - **Archive** button → inline "Archive? Yes / No" confirmation (no browser alert)
-- Read-only mode for shared cards (no Add Transaction or Pay/Archive actions)
+- Add Transaction form (date capped at today, amount validated against available credit)
+- Transaction table with Pay / Archive actions (inline confirmation, no browser alerts)
+- Read-only mode for shared cards
 
 ### Payment Modal
 - Record partial or full payments
@@ -80,91 +76,90 @@ Users can add cards, log transactions, record payments, and share cards with oth
 ### Card Sharing
 - Owner can share cards with other users by email
 - Shared cards visible to recipient under "Shared with me" tab
-- Email notification sent via Render backend when a share is created
+- Email notification sent via Render backend
 - Pending invites badge on Navbar
 
-### Email Notifications
-- Express server at `server/index.js` handles `POST /api/notify`
-- Uses Nodemailer with Gmail App Password
-- Frontend calls `${VITE_API_URL}/api/notify` (dynamic, not hardcoded)
-- Email is non-blocking — share still works if email fails
+### Borrowers & Lending (COMPLETE — committed b41a908)
+- **BorrowerTile** — initials avatar (deterministic color), totals (loaned/paid/outstanding), progress bar, overdue badge
+- **BorrowerForm** — add/edit borrower modal (full_name, address, phone, email)
+- **LoanPage** — borrower detail page with summary header, loan table, add loan, record payment
+- **LoanTable** — per-loan remaining, overdue status (computed frontend), progress bar per loan
+- **LoanForm** — one-time/weekly/monthly frequency, notarization fields (conditional)
+- **LoanPaymentModal** — partial/full payment, payment history, auto-advances next_payment_date, marks completed
+- **22 Vitest tests** for loan utility functions (loans.js)
+- 3 Supabase tables: `borrowers`, `loans`, `loan_payments` (all with RLS)
 
 ---
 
-## Fixes Applied This Session
+## Borrower Sharing Feature — IN PROGRESS (NOT YET CODED)
 
-| Fix | File(s) |
-|---|---|
-| Render: wrong start command (`node index.js` → `node server/index.js`) | Render dashboard |
-| Added CORS to Express server | `server/index.js` |
-| Frontend API calls now use `VITE_API_URL` env var instead of relative `/api/notify` | `src/hooks/useShares.js` |
-| Default theme changed to **light mode** (was dark by default for new users) | `src/store/useAppStore.js` |
-| Transaction amount validated against available credit limit | `src/components/tracker/TransactionForm.jsx` |
-| Future transaction dates blocked (max = today) | `src/components/tracker/TransactionForm.jsx` |
-| Archive confirmation replaced with inline Yes/No (no browser alert) | `src/components/tracker/TransactionTable.jsx` |
-| Delete card confirmation replaced with inline banner (no browser alert) | `src/components/cards/CardForm.jsx` |
+### Status: Plan written, SQL not yet run, Tasks 2–7 not yet implemented
 
----
+### What needs to happen next session
+Use keyword: **"continue borrower sharing"** → read this file → pick up from Task 1
 
-## Borrowers Feature — In Progress (NOT YET CODED)
+### Task Checklist
+- [ ] **Task 1 (MANUAL):** Run SQL in Supabase — create `borrower_shares` table + RLS + RPC
+- [ ] **Task 2:** Create `src/hooks/useBorrowerShares.js` (8 hooks)
+- [ ] **Task 3:** Create `src/components/borrowers/BorrowerShareModal.jsx`
+- [ ] **Task 4:** Add `readOnly` prop to `BorrowerTile` + `LoanTable`
+- [ ] **Task 5:** Modify `src/pages/LoanPage.jsx` (Share button + read-only mode)
+- [ ] **Task 6:** Create `src/pages/SharedBorrowersPage.jsx`
+- [ ] **Task 7:** Modify `Navbar.jsx` + `App.jsx` (link, badge, route, RPC call)
 
-### Status: Brainstorming complete, design approved, spec not yet written, implementation not started
+### Plan file
+`docs/superpowers/plans/2026-04-11-borrower-sharing.md`
 
-### Decisions Made
-- **Scope:** Owner-side only (no borrower login/sharing for now)
-- **Interest:** Raw loan amount only, no interest calculation yet
-- **Notarization fields:** IN SCOPE (Lawyer Name, PTR Number, Date Notarized)
-- **Payment frequency:** Per-loan setting — one-time / weekly / monthly
-  - Monthly includes a payment day field (15 or 30)
-  - Next payment date auto-updates after each payment recorded
-- **Architecture:** Option A — mirrors CC Tracker structure (BorrowerTile on dashboard, click → LoanPage)
+### Design spec
+`docs/superpowers/specs/2026-04-11-borrower-sharing-design.md`
 
-### Approved Data Model
-Three new Supabase tables: `borrowers`, `loans`, `loan_payments`
+### SQL to run (Task 1 — full SQL is in the plan file)
+```sql
+create table borrower_shares (
+  id uuid default gen_random_uuid() primary key,
+  owner_id uuid references auth.users not null,
+  owner_email text not null,
+  viewer_email text not null,
+  viewer_id uuid references auth.users,
+  borrower_id uuid references borrowers(id) on delete cascade not null,
+  borrower_name text not null,
+  borrower_phone text not null,
+  borrower_email text not null,
+  status text not null default 'unclaimed',
+  created_at timestamptz default now()
+);
+-- + RLS policies + viewer policies on loans/loan_payments + RPC
+-- See full SQL in docs/superpowers/plans/2026-04-11-borrower-sharing.md Task 1
+```
 
-**borrowers:** id, user_id, full_name, address, phone, email, is_archived, created_at
-
-**loans:** id, borrower_id, user_id, amount, loan_date, description, payment_frequency, payment_day (nullable, 15 or 30 for monthly), next_payment_date, status (active/completed/overdue/defaulted), notarized, lawyer_name, ptr_number, date_notarized, is_archived, created_at
-
-**loan_payments:** id, loan_id, user_id, amount, notes, paid_at
-
-Overdue status computed on frontend: next_payment_date < today AND remaining balance > 0
-
-### UI Decisions
-- **Borrower avatar:** Show initials only (e.g. John Smith → "JS"), no image/avatar. Styled as a colored circle with white initials.
-
-### Next Steps (next session)
-1. Write design spec to `docs/superpowers/specs/`
-2. Write implementation plan (writing-plans skill)
-3. Create Supabase tables (SQL migration)
-4. Build: hooks → BorrowerTile → BorrowerForm → LoanPage → LoanForm → PaymentLedger
-5. Wire into DashboardPage under cards
-6. Test on localhost
-7. Commit only after user confirms everything works
-
-### Supabase Note
-No URL config changes needed for localhost testing of borrowers feature.
-If Google OAuth is needed on localhost: add `http://localhost:5173` to Supabase redirect URLs list (do NOT change Site URL).
+### Key design decisions
+- `borrower_shares` is SEPARATE from `shares` (card sharing table) — no mixing
+- Denormalized `borrower_name`, `borrower_phone`, `borrower_email` stored on share row — viewer reads these instead of querying `borrowers` table (avoids RLS complexity)
+- Viewer RLS added to `loans` and `loan_payments` tables
+- `claim_pending_borrower_shares` RPC called on login (mirrors existing `claim_pending_shares`)
+- Viewer mode: read-only — no Pay, no Add Loan, no Share button
+- Shared borrowers appear in separate `/shared-borrowers` page (not mixed with card "Shared with me")
+- `useSharedBorrowerInfo(borrowerId, { enabled: readOnly })` used in LoanPage to get borrower data for viewer
+- Subagent-Driven Development chosen as execution approach
 
 ---
 
 ## Known Issues / Not Yet Done
-- Email sending on production not confirmed working (Render free tier sleeps after 15 min inactivity — first request after sleep can time out)
-  - Diagnose: open DevTools → Network → trigger a share → check `/api/notify` request status and URL
-  - Possible cause: Gmail App Password may be wrong format (must be 16-char app password, not regular password)
-- Render free tier spins down after inactivity — first load of backend can take ~30–60 seconds
+- Email sending on production not confirmed working (Render free tier sleeps — first request after sleep can time out)
+  - Diagnose: DevTools → Network → trigger share → check `/api/notify` request status
+  - Possible cause: Gmail App Password may be wrong format (must be 16-char app password)
+- Render free tier spins down after inactivity — first load of backend takes ~30–60 seconds
 
 ---
 
 ## Git Log (latest first)
 ```
+1c638ed docs: add borrower sharing implementation plan
+1a1734c docs: add borrower sharing feature design spec
+b41a908 feat: add borrowers & lending tracker feature
+20955e0 docs: add current-progress.md with full session summary
 7c4815c fix: replace confirm() alerts with inline UI, block future transaction dates
 d5da172 fix: default to light mode and validate transaction amount against available credit
 90a6e38 feat: add CORS support and dynamic API URL for split Vercel/Render deployment
 4c72500 feat: add card sharing, fix auth flow, fix email, fix signup
-266a8ce feat: add Google OAuth sign-in button to auth page
-e07d20f feat: add payment modal with history log and partial/full payment support
-3294e02 feat: add transaction form with Zod validation
-b9b6776 feat: build tracker page with summary header and transaction table
-12cc801 feat: build dashboard page with card grid, add/edit modals, toasts
 ```
