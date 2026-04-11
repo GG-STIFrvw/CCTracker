@@ -76,7 +76,7 @@ export function useCreateShare() {
       if (error) throw error
 
       // Non-blocking email notification — failure does not fail the share
-      fetch('/api/notify', {
+      fetch(`${import.meta.env.VITE_API_URL || ''}/api/notify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

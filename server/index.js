@@ -1,11 +1,13 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import nodemailer from 'nodemailer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }))
 app.use(express.json())
 
 // Serve built frontend in production
