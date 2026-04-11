@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { formatPeso, getRemainingBalance } from '../../utils/money.js'
 import { useArchiveTransaction } from '../../hooks/useTransactions.js'
 import Badge from '../ui/Badge.jsx'
@@ -14,6 +15,7 @@ function formatDate(dateStr) {
 
 export default function TransactionTable({ transactions, cardId, onPay, readOnly = false }) {
   const archive = useArchiveTransaction()
+  const [confirmArchiveId, setConfirmArchiveId] = useState(null)
 
   if (!transactions || transactions.length === 0) {
     return (
@@ -72,18 +74,34 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
                         Pay
                       </Button>
                     )}
-                    <button
-                      onClick={() => {
-                        if (confirm('Archive this transaction? It will no longer appear in your tracker.')) {
-                          archive.mutate({ id: t.id, cardId })
-                        }
-                      }}
-                      className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
-                      title="Archive transaction"
-                      disabled={archive.isPending}
-                    >
-                      Archive
-                    </button>
+                    {confirmArchiveId === t.id ? (
+                      <span className="flex items-center gap-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Archive?</span>
+                        <button
+                          onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
+                          className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
+                          disabled={archive.isPending}
+                        >
+                          Yes
+                        </button>
+                        <span className="text-gray-300 dark:text-gray-600">/</span>
+                        <button
+                          onClick={() => setConfirmArchiveId(null)}
+                          className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        >
+                          No
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmArchiveId(t.id)}
+                        className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
+                        title="Archive transaction"
+                        disabled={archive.isPending}
+                      >
+                        Archive
+                      </button>
+                    )}
                   </div>
                 </td>
               )}

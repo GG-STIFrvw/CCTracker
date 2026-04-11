@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cardSchema } from '../../lib/zod-schemas.js'
@@ -38,6 +38,7 @@ export default function CardForm({ card, onClose, onSuccess }) {
     },
   })
 
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const addCard = useAddCard()
   const updateCard = useUpdateCard()
   const deleteCard = useDeleteCard()
@@ -59,7 +60,6 @@ export default function CardForm({ card, onClose, onSuccess }) {
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this card and all its transactions? This cannot be undone.')) return
     await deleteCard.mutateAsync(card.id)
     onClose()
   }
@@ -150,13 +150,26 @@ export default function CardForm({ card, onClose, onSuccess }) {
           </div>
         </div>
 
+        {confirmDelete && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
+            <p className="text-red-700 dark:text-red-300 text-sm">Delete this card and all its transactions? This cannot be undone.</p>
+            <div className="flex gap-2 flex-shrink-0">
+              <Button type="button" variant="ghost" onClick={() => setConfirmDelete(false)} className="text-xs py-1 px-2">
+                Cancel
+              </Button>
+              <Button type="button" variant="danger" onClick={handleDelete} disabled={deleteCard.isPending} className="text-xs py-1 px-2">
+                {deleteCard.isPending ? 'Deleting…' : 'Confirm'}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2 pt-2">
-          {isEdit && (
+          {isEdit && !confirmDelete && (
             <Button
               type="button"
               variant="danger"
-              onClick={handleDelete}
-              disabled={deleteCard.isPending}
+              onClick={() => setConfirmDelete(true)}
               className="flex-1"
             >
               Delete
