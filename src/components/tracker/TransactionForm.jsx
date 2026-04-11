@@ -1,7 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { transactionSchema } from '../../lib/zod-schemas.js'
 import { useAddTransaction } from '../../hooks/useTransactions.js'
+import { getRemainingBalance } from '../../utils/money.js'
 import Button from '../ui/Button.jsx'
 
 function Field({ label, error, children }) {
@@ -17,7 +19,20 @@ function Field({ label, error, children }) {
 const inputCls =
   'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 w-full transition-colors'
 
-export default function TransactionForm({ cardId, onSuccess }) {
+export default function TransactionForm({ cardId, card, transactions = [], onSuccess }) {
+  const outstanding = transactions.reduce(
+    (acc, t) => acc + getRemainingBalance(t.amount, t.amount_paid),
+    0
+  )
+  const availableCredit = (card?.spending_limit ?? Infinity) - outstanding
+
+  const schema = transactionSchema.extend({
+    amount: z.coerce
+      .number({ invalid_type_error: 'Must be a number' })
+      .positive('Amount must be greater than 0')
+      .max(availableCredit, `Exceeds available credit (₱${availableCredit.toLocaleString('en-PH', { minimumFractionDigits: 2 })})`),
+  })
+
   const addTransaction = useAddTransaction()
   const {
     register,
@@ -25,7 +40,7 @@ export default function TransactionForm({ cardId, onSuccess }) {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(transactionSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       transaction_date: new Date().toISOString().split('T')[0],
       amount: '',

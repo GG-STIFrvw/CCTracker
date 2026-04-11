@@ -2,9 +2,11 @@ import { create } from 'zustand'
 
 const useAppStore = create((set) => ({
   user: null,
-  isDark: typeof localStorage !== 'undefined'
-    ? localStorage.getItem('isDark') !== 'false'
-    : true,
+  isDark: (() => {
+    const dark = localStorage.getItem('isDark') === 'true'
+    document.documentElement.classList.toggle('dark', dark)
+    return dark
+  })(),
   setUser: (user) => set({ user }),
   toggleDark: () =>
     set((s) => {

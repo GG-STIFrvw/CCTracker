@@ -61,6 +61,8 @@ export default function TrackerPage() {
         {!readOnly && (
           <TransactionForm
             cardId={cardId}
+            card={card}
+            transactions={transactions}
             onSuccess={() => toast('Transaction added!', 'success')}
           />
         )}
