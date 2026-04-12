@@ -88,8 +88,8 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
               {/* Preview / icon */}
               {att.mime_type.startsWith('image/') ? (
                 att.signedUrl ? (
-                  <a href={att.signedUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
-                    <img src={att.signedUrl} alt={att.file_name} className="w-16 h-16 object-cover rounded" />
+                  <a href={att.signedUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 w-16 h-16 rounded overflow-hidden block cursor-zoom-in">
+                    <img src={att.signedUrl} alt={att.file_name} className="w-16 h-16 object-cover rounded transition-transform duration-200 hover:scale-150" />
                   </a>
                 ) : (
                   <div className="shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-2xl">🖼️</div>
