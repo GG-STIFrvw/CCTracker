@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { formatPeso, getRemainingBalance } from '../../utils/money.js'
 import { useArchiveTransaction } from '../../hooks/useTransactions.js'
 import { useTransactionAttachmentCounts } from '../../hooks/useAttachments.js'
@@ -20,7 +20,7 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
   const [confirmArchiveId, setConfirmArchiveId] = useState(null)
   const [attachingTxId, setAttachingTxId] = useState(null)
 
-  const txIds = transactions.map((t) => t.id)
+  const txIds = useMemo(() => transactions.map((t) => t.id), [transactions])
   const { data: attCounts = {} } = useTransactionAttachmentCounts(txIds)
 
   if (!transactions || transactions.length === 0) {
@@ -73,18 +73,20 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
                     {t.notes || '—'}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => setAttachingTxId(t.id)}
-                      className="relative inline-flex items-center gap-1 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors text-xs"
-                      title="Attachments"
-                    >
-                      📎
-                      {count > 0 && (
-                        <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
-                          {count}
-                        </span>
-                      )}
-                    </button>
+                    {(!readOnly || count > 0) && (
+                      <button
+                        onClick={() => setAttachingTxId(t.id)}
+                        className="relative inline-flex items-center gap-1 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors text-xs"
+                        title="Attachments"
+                      >
+                        📎
+                        {count > 0 && (
+                          <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    )}
                   </td>
                   {!readOnly && (
                     <td className="px-4 py-3 text-center">
