@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import useAppStore from '../../store/useAppStore.js'
 import Button from '../ui/Button.jsx'
-import { SunIcon, MoonIcon } from '../ui/icons.jsx'
+import { SunIcon, MoonIcon, OwlIcon } from '../ui/icons.jsx'
 import { usePendingInvites } from '../../hooks/useShares.js'
 import { usePendingBorrowerInvites } from '../../hooks/useBorrowerShares.js'
 
@@ -25,11 +25,9 @@ export default function Navbar() {
         className="flex items-center gap-2 mr-auto"
         aria-label="Go to dashboard"
       >
-        <span className="bg-[#9FE870] text-black font-black px-3 py-1 rounded-lg text-sm tracking-tight">
-          CC
-        </span>
-        <span className="text-gray-900 dark:text-white font-semibold hidden sm:inline">
-          Tracker
+        <OwlIcon className="w-7 h-7" />
+        <span className="text-gray-900 dark:text-white font-bold hidden sm:inline tracking-tight">
+          OWL <span className="text-[#9FE870]">Tracker</span>
         </span>
       </button>
 

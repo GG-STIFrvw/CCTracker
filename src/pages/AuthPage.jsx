@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { supabase } from '../lib/supabase.js'
 import { loginSchema, registerSchema } from '../lib/zod-schemas.js'
 import Button from '../components/ui/Button.jsx'
+import { OwlIcon } from '../components/ui/icons.jsx'
 import useAppStore from '../store/useAppStore.js'
 
 async function signInWithGoogle() {
@@ -38,7 +39,7 @@ const InputField = forwardRef(function InputField({ label, error, ...props }, re
       <label className="text-sm text-gray-600 dark:text-gray-400">{label}</label>
       <input
         ref={ref}
-        className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+        className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent transition-colors"
         {...props}
       />
       {error && <p className="text-red-500 dark:text-red-400 text-xs mt-0.5">{error}</p>}
@@ -55,7 +56,7 @@ const PasswordField = forwardRef(function PasswordField({ label, error, ...props
         <input
           ref={ref}
           type={show ? 'text' : 'password'}
-          className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+          className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent transition-colors"
           {...props}
         />
         <button
@@ -140,7 +141,7 @@ function LoginForm({ onSwitch, onForgot }) {
         <button type="button" onClick={onForgot} className="text-gray-500 hover:text-gray-300 transition-colors">
           Forgot password?
         </button>
-        <button type="button" onClick={onSwitch} className="text-blue-400 hover:underline">
+        <button type="button" onClick={onSwitch} className="text-[#2D6A4F] dark:text-[#9FE870] hover:underline">
           Create account
         </button>
       </div>
@@ -185,7 +186,7 @@ function RegisterForm({ onSwitch }) {
         <button
           type="button"
           onClick={onSwitch}
-          className="text-blue-400 text-sm mt-4 hover:underline block mx-auto"
+          className="text-[#2D6A4F] dark:text-[#9FE870] text-sm mt-4 hover:underline block mx-auto"
         >
           Back to Sign In
         </button>
@@ -225,7 +226,7 @@ function RegisterForm({ onSwitch }) {
       <button
         type="button"
         onClick={onSwitch}
-        className="text-blue-400 text-sm text-center hover:underline"
+        className="text-[#2D6A4F] dark:text-[#9FE870] text-sm text-center hover:underline"
       >
         Already registered? Sign In
       </button>
@@ -261,7 +262,7 @@ function ForgotPasswordForm({ onBack }) {
         <button
           type="button"
           onClick={onBack}
-          className="text-blue-400 text-sm mt-4 hover:underline block mx-auto"
+          className="text-[#2D6A4F] dark:text-[#9FE870] text-sm mt-4 hover:underline block mx-auto"
         >
           Back to Sign In
         </button>
@@ -283,7 +284,7 @@ function ForgotPasswordForm({ onBack }) {
           placeholder="you@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+          className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
         />
       </div>
       <Button type="submit" disabled={loading} className="w-full justify-center">
@@ -313,15 +314,21 @@ export default function AuthPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-600 rounded-xl px-4 py-2 mb-4">
-            <span className="font-bold text-white text-lg tracking-tight">CC</span>
-            <span className="text-blue-200 text-sm">Tracker</span>
+          <div className="flex justify-center mb-3">
+            <OwlIcon className="w-16 h-16" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{titles[tab]}</h1>
+          <p className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+            OWL <span className="text-[#9FE870]">Tracker</span>
+          </p>
+          {tab === 'login' && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 tracking-wide">
+              Control Your Cards. Track Every Debt.
+            </p>
+          )}
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-5">{titles[tab]}</h1>
           <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
-            {tab === 'login' && 'Track your credit card spending'}
             {tab === 'register' && 'Get started for free'}
-            {tab === 'forgot' && 'We\'ll send you a reset link'}
+            {tab === 'forgot' && "We'll send you a reset link"}
           </p>
         </div>
 
