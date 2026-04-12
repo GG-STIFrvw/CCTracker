@@ -47,9 +47,9 @@ export default function TrackerPage() {
       <main className="max-w-6xl mx-auto p-6">
         <button
           onClick={() => navigate(readOnly ? '/shared' : '/')}
-          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm mb-4 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-6"
         >
-          <ReturnIcon className="w-4 h-4" />
+          <ReturnIcon className="w-3.5 h-3.5" />
           Back to {readOnly ? 'Shared with me' : 'Dashboard'}
         </button>
 
@@ -70,14 +70,16 @@ export default function TrackerPage() {
         )}
 
         {isLoading ? (
-          <p className="text-gray-500 text-center py-10">Loading transactions…</p>
+          <p className="text-gray-500 text-center py-10 mt-6">Loading transactions…</p>
         ) : (
-          <TransactionTable
-            transactions={transactions}
-            cardId={cardId}
-            onPay={setPayingTransaction}
-            readOnly={readOnly}
-          />
+          <div className="mt-6">
+            <TransactionTable
+              transactions={transactions}
+              cardId={cardId}
+              onPay={setPayingTransaction}
+              readOnly={readOnly}
+            />
+          </div>
         )}
       </main>
 
