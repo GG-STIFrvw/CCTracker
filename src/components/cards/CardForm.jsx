@@ -137,7 +137,7 @@ export default function CardForm({ card, onClose, onSuccess }) {
             <input
               type="color"
               {...register('color_primary')}
-              className="h-9 w-full rounded cursor-pointer bg-gray-800 border border-gray-600"
+              className="h-9 w-full rounded-xl cursor-pointer border-0 p-0.5 bg-gray-50 dark:bg-gray-800"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -145,7 +145,7 @@ export default function CardForm({ card, onClose, onSuccess }) {
             <input
               type="color"
               {...register('color_secondary')}
-              className="h-9 w-full rounded cursor-pointer bg-gray-800 border border-gray-600"
+              className="h-9 w-full rounded-xl cursor-pointer border-0 p-0.5 bg-gray-50 dark:bg-gray-800"
             />
           </div>
         </div>
