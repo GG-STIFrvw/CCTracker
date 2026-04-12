@@ -14,7 +14,7 @@ function formatDateTime(dt) {
 }
 
 const inputCls =
-  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm w-full focus:outline-none focus:border-blue-500 transition-colors'
+  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm w-full focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent transition-colors'
 
 export default function PaymentModal({ transaction, onClose, onSuccess }) {
   const remaining = getRemainingBalance(transaction.amount, transaction.amount_paid)
@@ -70,7 +70,7 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
         )}
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 dark:text-gray-400">Payment Amount (PHP)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Payment Amount (PHP)</label>
           <input
             type="number"
             step="0.01"
@@ -84,7 +84,7 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
           )}
           <button
             type="button"
-            className="text-blue-600 dark:text-blue-400 text-xs text-left hover:underline mt-0.5"
+            className="text-[#2D6A4F] dark:text-[#9FE870] text-xs text-left hover:underline mt-0.5"
             onClick={() => setValue('amount', remaining.toString())}
           >
             Pay full remaining ({formatPeso(remaining)})
@@ -92,7 +92,7 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500 dark:text-gray-400">Notes (optional)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Notes (optional)</label>
           <input
             type="text"
             placeholder="Bank transfer, GCash…"

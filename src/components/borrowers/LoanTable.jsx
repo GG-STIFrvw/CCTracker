@@ -5,10 +5,17 @@ import { useLoanAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
 
 const STATUS_STYLES = {
-  active: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+  active: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
   completed: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
   defaulted: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
   overdue: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+}
+
+function progressBarColor(pct) {
+  if (pct >= 100) return 'bg-emerald-600'
+  if (pct > 80) return 'bg-emerald-500'
+  if (pct >= 50) return 'bg-amber-400'
+  return 'bg-red-400'
 }
 
 export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }) {
@@ -27,7 +34,7 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
             <tr>
@@ -67,9 +74,9 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                       {loan.notarized && (
                         <p className="text-gray-400 text-xs mt-0.5">Notarized</p>
                       )}
-                      <div className="mt-1.5 h-1 bg-gray-100 dark:bg-gray-700 rounded-full w-32">
+                      <div className="mt-1.5 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full w-32 overflow-hidden">
                         <div
-                          className="h-full bg-emerald-500 rounded-full"
+                          className={`h-full rounded-full ${progressBarColor(pct)}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -78,13 +85,13 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {loan.loan_date}
                   </td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                  <td className="px-4 py-3 text-right font-mono font-medium text-gray-900 dark:text-white whitespace-nowrap">
                     {formatPeso(loan.amount)}
                   </td>
-                  <td className="px-4 py-3 text-right text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                  <td className="px-4 py-3 text-right font-mono text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                     {formatPeso(totalPaid)}
                   </td>
-                  <td className="px-4 py-3 text-right text-red-500 dark:text-red-400 whitespace-nowrap">
+                  <td className="px-4 py-3 text-right font-mono text-red-500 dark:text-red-400 whitespace-nowrap">
                     {formatPeso(remaining)}
                   </td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
@@ -101,12 +108,12 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                     {(!readOnly || count > 0) && (
                       <button
                         onClick={() => setAttachingLoanId(loan.id)}
-                        className="inline-flex items-center gap-1 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors text-xs"
+                        className="inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs"
                         title="Attachments"
                       >
                         📎
                         {count > 0 && (
-                          <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
+                          <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
                             {count}
                           </span>
                         )}
@@ -117,7 +124,7 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                     {!readOnly && loan.status !== 'completed' && loan.status !== 'defaulted' && (
                       <button
                         onClick={() => onPay(loan)}
-                        className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium"
+                        className="text-[#2D6A4F] dark:text-[#9FE870] hover:text-[#9FE870] dark:hover:text-white text-xs font-semibold transition-colors"
                       >
                         Pay
                       </button>

@@ -9,7 +9,7 @@ import Button from '../ui/Button.jsx'
 function Field({ label, error, children }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-gray-500 dark:text-gray-400">{label}</label>
+      <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</label>
       {children}
       {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
     </div>
@@ -17,7 +17,7 @@ function Field({ label, error, children }) {
 }
 
 const inputCls =
-  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 w-full transition-colors'
+  'bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent w-full transition-colors'
 
 const today = new Date().toISOString().split('T')[0]
 
@@ -68,7 +68,7 @@ export default function TransactionForm({ cardId, card, transactions = [], onSuc
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4"
+      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5"
     >
       <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-sm">Add Transaction</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

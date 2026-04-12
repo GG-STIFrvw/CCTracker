@@ -56,7 +56,7 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
             Loan Amount (PHP)
           </label>
           <input
@@ -64,45 +64,45 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
             type="number"
             step="0.01"
             placeholder="5000.00"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
           />
           {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount.message}</p>}
         </div>
 
         {/* Loan Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
             Loan Date
           </label>
           <input
             {...register('loan_date')}
             type="date"
             max={today}
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
           />
           {errors.loan_date && <p className="text-red-500 text-xs mt-1">{errors.loan_date.message}</p>}
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
             Description (optional)
           </label>
           <input
             {...register('description')}
             placeholder="e.g. Cash loan, iPhone 15"
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
           />
         </div>
 
         {/* Payment Frequency */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
             Payment Frequency
           </label>
           <select
             {...register('payment_frequency')}
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
           >
             <option value="one-time">One-time</option>
             <option value="weekly">Weekly</option>
@@ -113,12 +113,12 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
         {/* Payment Day (monthly only) */}
         {frequency === 'monthly' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
               Payment Day
             </label>
             <select
               {...register('payment_day')}
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
             >
               <option value="">Select day</option>
               <option value={15}>15th</option>
@@ -131,13 +131,13 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
         {/* Next Payment Date (weekly or monthly) */}
         {frequency !== 'one-time' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
               First Payment Date
             </label>
             <input
               {...register('next_payment_date')}
               type="date"
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
             />
           </div>
         )}
@@ -148,9 +148,9 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
             {...register('notarized')}
             type="checkbox"
             id="notarized"
-            className="h-4 w-4 rounded border-gray-300 text-blue-500"
+            className="h-4 w-4 rounded border-gray-300 accent-[#9FE870]"
           />
-          <label htmlFor="notarized" className="text-sm text-gray-700 dark:text-gray-300">
+          <label htmlFor="notarized" className="text-sm text-gray-700 dark:text-gray-200">
             This loan is notarized
           </label>
         </div>
@@ -163,25 +163,25 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
               { name: 'ptr_number', label: 'PTR Number', placeholder: 'PTR-12345' },
             ].map(({ name, label, placeholder }) => (
               <div key={name}>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
                   {label}
                 </label>
                 <input
                   {...register(name)}
                   placeholder={placeholder}
-                  className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
                 />
                 {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>}
               </div>
             ))}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
                 Date Notarized
               </label>
               <input
                 {...register('date_notarized')}
                 type="date"
-                className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
               />
             </div>
           </div>

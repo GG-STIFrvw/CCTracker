@@ -33,7 +33,7 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
@@ -76,12 +76,12 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
                     {(!readOnly || count > 0) && (
                       <button
                         onClick={() => setAttachingTxId(t.id)}
-                        className="relative inline-flex items-center gap-1 text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors text-xs"
+                        className="relative inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs"
                         title="Attachments"
                       >
                         📎
                         {count > 0 && (
-                          <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
+                          <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
                             {count}
                           </span>
                         )}

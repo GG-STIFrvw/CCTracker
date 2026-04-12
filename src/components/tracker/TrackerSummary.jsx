@@ -16,7 +16,7 @@ function StatBox({ label, value, colorClass }) {
   return (
     <div className="flex flex-col gap-1">
       <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</p>
-      <p className={`text-xl font-bold font-mono ${colorClass}`}>{formatPeso(value)}</p>
+      <p className={`text-2xl font-black font-mono ${colorClass}`}>{formatPeso(value)}</p>
     </div>
   )
 }

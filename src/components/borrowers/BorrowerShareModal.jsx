@@ -108,7 +108,7 @@ export default function BorrowerShareModal({ borrower, onClose }) {
               setEmailError('')
               setSuccessMsg('')
             }}
-            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+            className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2.5 text-gray-900 dark:text-white text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent transition-colors"
           />
           {emailError && (
             <p className="text-red-500 dark:text-red-400 text-xs mt-1">{emailError}</p>

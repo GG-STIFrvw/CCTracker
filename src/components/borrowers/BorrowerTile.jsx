@@ -76,23 +76,25 @@ export default function BorrowerTile({ borrower, onEdit, readOnly = false }) {
 
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div>
-          <p className="text-gray-400 text-xs">Loaned</p>
-          <p className="text-gray-900 dark:text-white text-sm font-medium">{formatPeso(totalLoaned)}</p>
+          <p className="text-gray-400 text-xs uppercase tracking-wide">Loaned</p>
+          <p className="text-gray-900 dark:text-white text-sm font-medium font-mono">{formatPeso(totalLoaned)}</p>
         </div>
         <div>
-          <p className="text-gray-400 text-xs">Paid</p>
-          <p className="text-emerald-600 dark:text-emerald-400 text-sm font-medium">{formatPeso(totalPaid)}</p>
+          <p className="text-gray-400 text-xs uppercase tracking-wide">Paid</p>
+          <p className="text-emerald-600 dark:text-emerald-400 text-sm font-medium font-mono">{formatPeso(totalPaid)}</p>
         </div>
         <div>
-          <p className="text-gray-400 text-xs">Outstanding</p>
-          <p className="text-red-500 dark:text-red-400 text-sm font-medium">{formatPeso(outstanding)}</p>
+          <p className="text-gray-400 text-xs uppercase tracking-wide">Outstanding</p>
+          <p className="text-red-500 dark:text-red-400 text-sm font-medium font-mono">{formatPeso(outstanding)}</p>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
         <div
-          className="h-full bg-emerald-500 rounded-full transition-all"
+          className={`h-full rounded-full transition-all ${
+            pct >= 100 ? 'bg-emerald-600' : pct > 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-400' : 'bg-red-400'
+          }`}
           style={{ width: `${pct}%` }}
         />
       </div>

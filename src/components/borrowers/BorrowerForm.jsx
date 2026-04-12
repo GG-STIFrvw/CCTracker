@@ -50,13 +50,13 @@ export default function BorrowerForm({ borrower = null, onClose, onSuccess }) {
           { name: 'email', label: 'Email', placeholder: 'juan@example.com' },
         ].map(({ name, label, placeholder }) => (
           <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
               {label}
             </label>
             <input
               {...register(name)}
               placeholder={placeholder}
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
             />
             {errors[name] && (
               <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>

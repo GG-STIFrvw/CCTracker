@@ -62,7 +62,7 @@ export default function LoanPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 dark:text-gray-400 mb-4">Borrower not found.</p>
-          <button onClick={() => navigate('/')} className="text-blue-400 hover:underline">
+          <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
             ← Go back to Dashboard
           </button>
         </div>
@@ -105,16 +105,16 @@ export default function LoanPage() {
           </div>
           <div className="grid grid-cols-3 gap-6 text-center sm:text-right">
             <div>
-              <p className="text-gray-400 text-xs mb-0.5">Total Loaned</p>
-              <p className="text-gray-900 dark:text-white font-semibold">{formatPeso(totalLoaned)}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Total Loaned</p>
+              <p className="text-gray-900 dark:text-white font-black font-mono text-lg">{formatPeso(totalLoaned)}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs mb-0.5">Total Paid</p>
-              <p className="text-emerald-600 dark:text-emerald-400 font-semibold">{formatPeso(totalPaid)}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Total Paid</p>
+              <p className="text-emerald-600 dark:text-emerald-400 font-black font-mono text-lg">{formatPeso(totalPaid)}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs mb-0.5">Outstanding</p>
-              <p className="text-red-500 dark:text-red-400 font-semibold">{formatPeso(outstanding)}</p>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Outstanding</p>
+              <p className="text-red-500 dark:text-red-400 font-black font-mono text-lg">{formatPeso(outstanding)}</p>
             </div>
           </div>
         </div>
@@ -123,14 +123,14 @@ export default function LoanPage() {
       <main className="max-w-6xl mx-auto p-6">
         <button
           onClick={() => navigate(readOnly ? '/shared-borrowers' : '/')}
-          className="text-blue-400 hover:underline text-sm mb-6 block"
+          className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm mb-6 block transition-colors"
         >
           ← Back to {readOnly ? 'Shared Borrowers' : 'Dashboard'}
         </button>
 
         {/* Read-only banner */}
         {readOnly && (
-          <div className="mb-4 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-blue-700 dark:text-blue-300 text-sm">
+          <div className="mb-4 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
             Viewing shared borrower — read only
           </div>
         )}
@@ -143,7 +143,7 @@ export default function LoanPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowShare(true)}
-                className="text-xs text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg transition-colors"
+                className="text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 Share
               </button>

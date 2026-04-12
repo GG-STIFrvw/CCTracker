@@ -24,7 +24,7 @@ export default function Navbar() {
         className="flex items-center gap-2 mr-auto"
         aria-label="Go to dashboard"
       >
-        <span className="bg-blue-600 text-white font-bold px-3 py-1 rounded-lg text-sm tracking-tight">
+        <span className="bg-[#9FE870] text-black font-black px-3 py-1 rounded-lg text-sm tracking-tight">
           CC
         </span>
         <span className="text-gray-900 dark:text-white font-semibold hidden sm:inline">
@@ -44,7 +44,7 @@ export default function Navbar() {
           onClick={() => navigate('/shared')}
           className={`relative text-sm px-3 py-1.5 rounded-lg transition-colors ${
             location.pathname === '/shared'
-              ? 'bg-blue-600 text-white'
+              ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
@@ -63,7 +63,7 @@ export default function Navbar() {
           onClick={() => navigate('/shared-borrowers')}
           className={`relative text-sm px-3 py-1.5 rounded-lg transition-colors ${
             location.pathname === '/shared-borrowers'
-              ? 'bg-blue-600 text-white'
+              ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
