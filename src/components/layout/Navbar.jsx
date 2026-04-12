@@ -25,9 +25,9 @@ export default function Navbar() {
         className="flex items-center gap-2 mr-auto"
         aria-label="Go to dashboard"
       >
-        <OwlIcon className="w-7 h-7" />
+        <OwlIcon className="w-7 h-7 text-gray-900 dark:text-white" />
         <span className="text-gray-900 dark:text-white font-bold hidden sm:inline tracking-tight">
-          OWL <span className="text-[#9FE870]">Tracker</span>
+          CC <span className="text-[#9FE870]">Tracker</span>
         </span>
       </button>
 

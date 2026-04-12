@@ -284,7 +284,7 @@ function ForgotPasswordForm({ onBack }) {
           placeholder="you@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent"
+          className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9FE870] focus:border-transparent w-full"
         />
       </div>
       <Button type="submit" disabled={loading} className="w-full justify-center">
@@ -318,7 +318,7 @@ export default function AuthPage() {
             <OwlIcon className="w-16 h-16" />
           </div>
           <p className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
-            OWL <span className="text-[#9FE870]">Tracker</span>
+            CC <span className="text-[#9FE870]">Tracker</span>
           </p>
           {tab === 'login' && (
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 tracking-wide">
