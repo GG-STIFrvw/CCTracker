@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import TrackerPage from './pages/TrackerPage.jsx'
 import SharedWithMePage from './pages/SharedWithMePage.jsx'
 import LoanPage from './pages/LoanPage.jsx'
+import SharedBorrowersPage from './pages/SharedBorrowersPage.jsx'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 30 } },
@@ -62,6 +63,9 @@ export default function App() {
         supabase.rpc('claim_pending_shares')
           .then(() => queryClient.invalidateQueries({ queryKey: ['pending-invites'] }))
           .catch(() => {})
+        supabase.rpc('claim_pending_borrower_shares')
+          .then(() => queryClient.invalidateQueries({ queryKey: ['pending-borrower-invites'] }))
+          .catch(() => {})
       }
     })
 
@@ -110,6 +114,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SharedWithMePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/shared-borrowers"
+            element={
+              <ProtectedRoute>
+                <SharedBorrowersPage />
               </ProtectedRoute>
             }
           />

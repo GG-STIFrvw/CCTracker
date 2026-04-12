@@ -14,7 +14,7 @@ function pickColor(name) {
   return AVATAR_COLORS[hash % AVATAR_COLORS.length]
 }
 
-export default function BorrowerTile({ borrower, onEdit }) {
+export default function BorrowerTile({ borrower, onEdit, readOnly = false }) {
   const navigate = useNavigate()
   const { data: loans = [] } = useLoans(borrower.id)
 
@@ -37,7 +37,7 @@ export default function BorrowerTile({ borrower, onEdit }) {
   return (
     <div
       className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => navigate(`/borrower/${borrower.id}`)}
+      onClick={() => navigate(`/borrower/${borrower.id}${readOnly ? '?readOnly=true' : ''}`)}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -60,15 +60,17 @@ export default function BorrowerTile({ borrower, onEdit }) {
               Overdue
             </span>
           )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(borrower)
-            }}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            Edit
-          </button>
+          {!readOnly && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit(borrower)
+              }}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              Edit
+            </button>
+          )}
         </div>
       </div>
 

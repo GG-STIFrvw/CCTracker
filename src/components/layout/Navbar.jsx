@@ -3,12 +3,14 @@ import { supabase } from '../../lib/supabase.js'
 import useAppStore from '../../store/useAppStore.js'
 import Button from '../ui/Button.jsx'
 import { usePendingInvites } from '../../hooks/useShares.js'
+import { usePendingBorrowerInvites } from '../../hooks/useBorrowerShares.js'
 
 export default function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isDark, toggleDark } = useAppStore()
   const { data: pendingInvites = [] } = usePendingInvites()
+  const { data: pendingBorrowerInvites = [] } = usePendingBorrowerInvites()
 
   async function signOut() {
     await supabase.auth.signOut()
@@ -50,6 +52,25 @@ export default function Navbar() {
           {pendingInvites.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
               {pendingInvites.length}
+            </span>
+          )}
+        </button>
+      )}
+
+      {/* Shared Borrowers link */}
+      {user && (
+        <button
+          onClick={() => navigate('/shared-borrowers')}
+          className={`relative text-sm px-3 py-1.5 rounded-lg transition-colors ${
+            location.pathname === '/shared-borrowers'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
+        >
+          Borrowers
+          {pendingBorrowerInvites.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              {pendingBorrowerInvites.length}
             </span>
           )}
         </button>

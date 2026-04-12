@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useBorrowers } from '../hooks/useBorrowers.js'
 import { useLoans } from '../hooks/useLoans.js'
+import { useSharedBorrowerInfo } from '../hooks/useBorrowerShares.js'
 import { getLoanInitials, getLoanTotalPaid, getLoanRemaining } from '../utils/loans.js'
 import { formatPeso, addMoney } from '../utils/money.js'
 import Navbar from '../components/layout/Navbar.jsx'
 import LoanTable from '../components/borrowers/LoanTable.jsx'
 import LoanForm from '../components/borrowers/LoanForm.jsx'
 import LoanPaymentModal from '../components/borrowers/LoanPaymentModal.jsx'
+import BorrowerShareModal from '../components/borrowers/BorrowerShareModal.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
 
@@ -25,16 +27,37 @@ function pickColor(name) {
 export default function LoanPage() {
   const { borrowerId } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const readOnly = searchParams.get('readOnly') === 'true'
+
   const { data: borrowers = [] } = useBorrowers()
   const { data: loans = [], isLoading } = useLoans(borrowerId)
+  const { data: sharedInfo } = useSharedBorrowerInfo(borrowerId, { enabled: readOnly })
   const { toasts, toast } = useToast()
 
   const [showAddLoan, setShowAddLoan] = useState(false)
   const [payingLoan, setPayingLoan] = useState(null)
+  const [showShare, setShowShare] = useState(false)
 
-  const borrower = borrowers.find((b) => b.id === borrowerId)
+  // Owner mode: find borrower from owned list
+  // Read-only mode: construct borrower object from denormalized share data
+  let borrower = null
+  if (readOnly) {
+    if (sharedInfo) {
+      borrower = {
+        id: sharedInfo.borrower_id,
+        full_name: sharedInfo.borrower_name,
+        phone: sharedInfo.borrower_phone,
+        email: sharedInfo.borrower_email,
+        address: null,
+      }
+    }
+  } else {
+    borrower = borrowers.find((b) => b.id === borrowerId)
+  }
 
-  if (borrowers.length > 0 && !borrower) {
+  // Not-found guard (owner mode only — viewer uses sharedInfo path)
+  if (!readOnly && borrowers.length > 0 && !borrower) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
@@ -72,7 +95,19 @@ export default function LoanPage() {
             {initials}
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{borrower.full_name}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                {borrower.full_name}
+              </h1>
+              {!readOnly && (
+                <button
+                  onClick={() => setShowShare(true)}
+                  className="text-xs text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 border border-gray-300 dark:border-gray-600 px-2 py-1 rounded-lg transition-colors"
+                >
+                  Share
+                </button>
+              )}
+            </div>
             <p className="text-gray-400 text-sm">{borrower.phone} · {borrower.email}</p>
             {borrower.address && (
               <p className="text-gray-400 text-xs mt-0.5">{borrower.address}</p>
@@ -97,27 +132,43 @@ export default function LoanPage() {
 
       <main className="max-w-6xl mx-auto p-6">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate(readOnly ? '/shared-borrowers' : '/')}
           className="text-blue-400 hover:underline text-sm mb-6 block"
         >
-          ← Back to Dashboard
+          ← Back to {readOnly ? 'Shared Borrowers' : 'Dashboard'}
         </button>
+
+        {/* Read-only banner */}
+        {readOnly && (
+          <div className="mb-4 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg text-blue-700 dark:text-blue-300 text-sm">
+            Viewing shared borrower — read only
+          </div>
+        )}
 
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Loans ({loans.length})
           </h2>
-          <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
+          {!readOnly && (
+            <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
+          )}
         </div>
 
         {isLoading ? (
           <p className="text-gray-500 text-center py-10">Loading loans…</p>
         ) : (
-          <LoanTable loans={loans} onPay={setPayingLoan} />
+          <LoanTable loans={loans} onPay={setPayingLoan} readOnly={readOnly} />
         )}
       </main>
 
-      {showAddLoan && (
+      {showShare && (
+        <BorrowerShareModal
+          borrower={borrower}
+          onClose={() => setShowShare(false)}
+        />
+      )}
+
+      {!readOnly && showAddLoan && (
         <LoanForm
           borrowerId={borrowerId}
           onClose={() => setShowAddLoan(false)}
@@ -125,7 +176,7 @@ export default function LoanPage() {
         />
       )}
 
-      {payingLoan && (
+      {!readOnly && payingLoan && (
         <LoanPaymentModal
           loan={payingLoan}
           onClose={() => setPayingLoan(null)}

@@ -8,7 +8,7 @@ const STATUS_STYLES = {
   overdue: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
 }
 
-export default function LoanTable({ loans, onPay }) {
+export default function LoanTable({ loans, onPay, readOnly = false }) {
   if (loans.length === 0) {
     return (
       <p className="text-gray-400 text-center py-10 text-sm">
@@ -87,7 +87,7 @@ export default function LoanTable({ loans, onPay }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {loan.status !== 'completed' && loan.status !== 'defaulted' && (
+                  {!readOnly && loan.status !== 'completed' && loan.status !== 'defaulted' && (
                     <button
                       onClick={() => onPay(loan)}
                       className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-xs font-medium"
