@@ -11,7 +11,7 @@ const MAX_FILES = 10
 export function useTransactionAttachmentCounts(transactionIds) {
   return useQuery({
     queryKey: ['transaction-attachment-counts', transactionIds],
-    enabled: transactionIds.length > 0,
+    enabled: Array.isArray(transactionIds) && transactionIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('transaction_attachments')
@@ -31,7 +31,7 @@ export function useTransactionAttachmentCounts(transactionIds) {
 export function useLoanAttachmentCounts(loanIds) {
   return useQuery({
     queryKey: ['loan-attachment-counts', loanIds],
-    enabled: loanIds.length > 0,
+    enabled: Array.isArray(loanIds) && loanIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('loan_attachments')
@@ -108,7 +108,8 @@ export function useUploadAttachment() {
       if (file.size > MAX_SIZE)
         throw new Error('File must be under 10 MB')
 
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) throw new Error('Not authenticated')
       const timestamp = Date.now()
       const safeName = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
       const folder = entityType === 'transaction' ? 'transactions' : 'loans'
