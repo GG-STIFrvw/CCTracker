@@ -1,5 +1,6 @@
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar.jsx'
-import { LinkIcon } from '../components/ui/icons.jsx'
+import { LinkIcon, ReturnIcon } from '../components/ui/icons.jsx'
 import CardTile from '../components/cards/CardTile.jsx'
 import {
   useSharedWithMe,
@@ -12,6 +13,7 @@ import useAppStore from '../store/useAppStore.js'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 
 export default function SharedWithMePage() {
+  const navigate = useNavigate()
   const user = useAppStore((s) => s.user)
   const { data: activeShares = [] } = useSharedWithMe()
   const { data: pendingInvites = [] } = usePendingInvites()
@@ -33,9 +35,18 @@ export default function SharedWithMePage() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          Shared with me
-        </h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Shared with me
+          </h1>
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <ReturnIcon className="w-3.5 h-3.5" />
+            Back to Dashboard
+          </button>
+        </div>
 
         {/* Pending invites section */}
         {pendingInvites.length > 0 && (
