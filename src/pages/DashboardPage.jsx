@@ -10,7 +10,7 @@ import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import BorrowerTile from '../components/borrowers/BorrowerTile.jsx'
 import BorrowerForm from '../components/borrowers/BorrowerForm.jsx'
 import { useBorrowers } from '../hooks/useBorrowers.js'
-import { BalanceIcon } from '../components/ui/icons.jsx'
+import { BalanceIcon, CreditCardIcon } from '../components/ui/icons.jsx'
 
 export default function DashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -58,7 +58,9 @@ export default function DashboardPage() {
 
         {!isLoading && !error && ownCards.length === 0 && (
           <div className="text-center py-24 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
-            <div className="text-5xl mb-4">💳</div>
+            <div className="flex justify-center mb-4">
+              <CreditCardIcon className="w-14 h-14 text-gray-300 dark:text-gray-600" />
+            </div>
             <p className="text-gray-700 dark:text-gray-300 text-lg font-medium">No cards yet</p>
             <p className="text-gray-500 text-sm mt-2 mb-6">
               Add your first credit card to start tracking spending

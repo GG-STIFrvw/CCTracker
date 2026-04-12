@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import useAppStore from '../../store/useAppStore.js'
 import Button from '../ui/Button.jsx'
+import { SunIcon, MoonIcon } from '../ui/icons.jsx'
 import { usePendingInvites } from '../../hooks/useShares.js'
 import { usePendingBorrowerInvites } from '../../hooks/useBorrowerShares.js'
 
@@ -82,7 +83,7 @@ export default function Navbar() {
         title="Toggle theme"
         aria-label="Toggle dark mode"
       >
-        {isDark ? '☀️' : '🌙'}
+        {isDark ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
       </button>
 
       <Button variant="ghost" onClick={signOut} className="text-sm">
