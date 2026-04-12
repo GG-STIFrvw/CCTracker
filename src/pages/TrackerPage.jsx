@@ -8,6 +8,7 @@ import TransactionTable from '../components/tracker/TransactionTable.jsx'
 import TransactionForm from '../components/tracker/TransactionForm.jsx'
 import PaymentModal from '../components/tracker/PaymentModal.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
+import { ReturnIcon } from '../components/ui/icons.jsx'
 
 export default function TrackerPage() {
   const { cardId } = useParams()
@@ -29,7 +30,7 @@ export default function TrackerPage() {
         <div className="text-center">
           <p className="text-gray-500 dark:text-gray-400 mb-4">Card not found.</p>
           <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-            ← Go back to Dashboard
+            <ReturnIcon className="w-4 h-4 inline mr-1" /> Go back to Dashboard
           </button>
         </div>
       </div>
@@ -46,9 +47,10 @@ export default function TrackerPage() {
       <main className="max-w-6xl mx-auto p-6">
         <button
           onClick={() => navigate(readOnly ? '/shared' : '/')}
-          className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm mb-4 block transition-colors"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm mb-4 transition-colors"
         >
-          ← Back to {readOnly ? 'Shared with me' : 'Dashboard'}
+          <ReturnIcon className="w-4 h-4" />
+          Back to {readOnly ? 'Shared with me' : 'Dashboard'}
         </button>
 
         {/* Read-only banner */}

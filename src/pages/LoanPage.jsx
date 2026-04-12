@@ -12,6 +12,7 @@ import LoanPaymentModal from '../components/borrowers/LoanPaymentModal.jsx'
 import BorrowerShareModal from '../components/borrowers/BorrowerShareModal.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
+import { ReturnIcon } from '../components/ui/icons.jsx'
 
 const AVATAR_COLORS = [
   'bg-violet-500', 'bg-blue-500', 'bg-emerald-500',
@@ -63,7 +64,7 @@ export default function LoanPage() {
         <div className="text-center">
           <p className="text-gray-500 dark:text-gray-400 mb-4">Borrower not found.</p>
           <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-            ← Go back to Dashboard
+            <ReturnIcon className="w-4 h-4 inline mr-1" /> Go back to Dashboard
           </button>
         </div>
       </div>
@@ -121,13 +122,6 @@ export default function LoanPage() {
       </div>
 
       <main className="max-w-6xl mx-auto p-6">
-        <button
-          onClick={() => navigate(readOnly ? '/shared-borrowers' : '/')}
-          className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-sm mb-6 block transition-colors"
-        >
-          ← Back to {readOnly ? 'Shared Borrowers' : 'Dashboard'}
-        </button>
-
         {/* Read-only banner */}
         {readOnly && (
           <div className="mb-4 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
@@ -139,17 +133,26 @@ export default function LoanPage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Loans ({loans.length})
           </h2>
-          {!readOnly && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowShare(true)}
-                className="text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                Share
-              </button>
-              <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(readOnly ? '/shared-borrowers' : '/')}
+              className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <ReturnIcon className="w-3.5 h-3.5" />
+              Back to {readOnly ? 'Shared Borrowers' : 'Dashboard'}
+            </button>
+            {!readOnly && (
+              <>
+                <button
+                  onClick={() => setShowShare(true)}
+                  className="text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Share
+                </button>
+                <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
+              </>
+            )}
+          </div>
         </div>
 
         {isLoading ? (
