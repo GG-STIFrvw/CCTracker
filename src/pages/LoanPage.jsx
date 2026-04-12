@@ -95,19 +95,9 @@ export default function LoanPage() {
             {initials}
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {borrower.full_name}
-              </h1>
-              {!readOnly && (
-                <button
-                  onClick={() => setShowShare(true)}
-                  className="text-xs text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 border border-gray-300 dark:border-gray-600 px-2 py-1 rounded-lg transition-colors"
-                >
-                  Share
-                </button>
-              )}
-            </div>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              {borrower.full_name}
+            </h1>
             <p className="text-gray-400 text-sm">{borrower.phone} · {borrower.email}</p>
             {borrower.address && (
               <p className="text-gray-400 text-xs mt-0.5">{borrower.address}</p>
@@ -150,7 +140,15 @@ export default function LoanPage() {
             Loans ({loans.length})
           </h2>
           {!readOnly && (
-            <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowShare(true)}
+                className="text-xs text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-lg transition-colors"
+              >
+                Share
+              </button>
+              <Button onClick={() => setShowAddLoan(true)}>+ Add Loan</Button>
+            </div>
           )}
         </div>
 
