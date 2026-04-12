@@ -155,7 +155,7 @@ export default function LoanPage() {
         {isLoading ? (
           <p className="text-gray-500 text-center py-10">Loading loans…</p>
         ) : (
-          <LoanTable loans={loans} onPay={setPayingLoan} readOnly={readOnly} />
+          <LoanTable loans={loans} onPay={setPayingLoan} readOnly={readOnly} borrowerId={borrowerId} />
         )}
       </main>
 
