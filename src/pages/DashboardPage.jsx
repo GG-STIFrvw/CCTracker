@@ -10,6 +10,7 @@ import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import BorrowerTile from '../components/borrowers/BorrowerTile.jsx'
 import BorrowerForm from '../components/borrowers/BorrowerForm.jsx'
 import { useBorrowers } from '../hooks/useBorrowers.js'
+import { BalanceIcon } from '../components/ui/icons.jsx'
 
 export default function DashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -94,7 +95,9 @@ export default function DashboardPage() {
 
           {!loadingBorrowers && borrowers.length === 0 && (
             <div className="text-center py-16 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
-              <div className="text-4xl mb-3">🤝</div>
+              <div className="flex justify-center mb-3">
+                <BalanceIcon className="w-12 h-12 text-gray-300 dark:text-gray-600" />
+              </div>
               <p className="text-gray-700 dark:text-gray-300 font-medium">No borrowers yet</p>
               <p className="text-gray-500 text-sm mt-1 mb-5">
                 Track money you lend to friends or family

@@ -5,6 +5,7 @@ import { useTransactionAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
 import Badge from '../ui/Badge.jsx'
 import Button from '../ui/Button.jsx'
+import { AttachmentIcon } from '../ui/icons.jsx'
 
 function formatDate(dateStr) {
   if (!dateStr) return '—'
@@ -79,7 +80,7 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
                         className="relative inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs"
                         title="Attachments"
                       >
-                        📎
+                        <AttachmentIcon className="w-4 h-4" />
                         {count > 0 && (
                           <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
                             {count}

@@ -1,4 +1,5 @@
 import Navbar from '../components/layout/Navbar.jsx'
+import { BalanceIcon } from '../components/ui/icons.jsx'
 import BorrowerTile from '../components/borrowers/BorrowerTile.jsx'
 import {
   useSharedBorrowersWithMe,
@@ -76,7 +77,9 @@ export default function SharedBorrowersPage() {
           </h2>
           {activeShares.length === 0 ? (
             <div className="text-center py-24 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
-              <div className="text-4xl mb-3">🤝</div>
+              <div className="flex justify-center mb-3">
+                <BalanceIcon className="w-12 h-12 text-gray-300 dark:text-gray-600" />
+              </div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">
                 No borrowers shared with you yet.
               </p>

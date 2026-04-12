@@ -3,6 +3,7 @@ import { getLoanTotalPaid, getLoanRemaining, isLoanOverdue } from '../../utils/l
 import { formatPeso } from '../../utils/money.js'
 import { useLoanAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
+import { AttachmentIcon } from '../ui/icons.jsx'
 
 const STATUS_STYLES = {
   active: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
@@ -111,7 +112,7 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                         className="inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs"
                         title="Attachments"
                       >
-                        📎
+                        <AttachmentIcon className="w-4 h-4" />
                         {count > 0 && (
                           <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
                             {count}
