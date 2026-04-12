@@ -83,7 +83,7 @@ export default function DashboardPage() {
         <div className="mt-10">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">My Borrowers</h2>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Borrowers</h1>
               <p className="text-gray-500 dark:text-gray-500 text-sm mt-0.5">
                 {borrowers.length} borrower{borrowers.length !== 1 ? 's' : ''} tracked
               </p>
