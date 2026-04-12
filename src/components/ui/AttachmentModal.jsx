@@ -14,6 +14,10 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
   const [uploadError, setUploadError] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
+  if (process.env.NODE_ENV !== 'production' && entityType !== 'transaction' && entityType !== 'loan') {
+    console.error(`AttachmentModal: unknown entityType "${entityType}"`)
+  }
+
   const txQuery = useTransactionAttachments(entityType === 'transaction' ? entityId : null)
   const loanQuery = useLoanAttachments(entityType === 'loan' ? entityId : null)
   const query = entityType === 'transaction' ? txQuery : loanQuery
@@ -83,27 +87,22 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
             >
               {/* Preview / icon */}
               {att.mime_type.startsWith('image/') ? (
-                <a
-                  href={att.signedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0"
-                >
-                  <img
-                    src={att.signedUrl}
-                    alt={att.file_name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                </a>
+                att.signedUrl ? (
+                  <a href={att.signedUrl} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                    <img src={att.signedUrl} alt={att.file_name} className="w-16 h-16 object-cover rounded" />
+                  </a>
+                ) : (
+                  <div className="shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-2xl">🖼️</div>
+                )
               ) : (
-                <a
-                  href={att.signedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-3xl"
-                >
-                  📄
-                </a>              )}
+                att.signedUrl ? (
+                  <a href={att.signedUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-3xl">
+                    📄
+                  </a>
+                ) : (
+                  <div className="shrink-0 w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-3xl">📄</div>
+                )
+              )}
 
               {/* Info */}
               <div className="flex-1 min-w-0">
@@ -111,14 +110,13 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
                 <p className="text-xs text-gray-400 mb-1">
                   {(att.file_size / 1024).toFixed(0)} KB
                 </p>
-                <a
-                  href={att.signedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-blue-500 hover:underline"
-                >
-                  {att.mime_type === 'application/pdf' ? 'Download PDF' : 'View full size'}
-                </a>
+                {att.signedUrl ? (
+                  <a href={att.signedUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline">
+                    {att.mime_type === 'application/pdf' ? 'Download PDF' : 'View full size'}
+                  </a>
+                ) : (
+                  <span className="text-xs text-red-400">File unavailable</span>
+                )}
               </div>
 
               {/* Delete — owner only */}
@@ -128,8 +126,13 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
                     <span className="flex items-center gap-1 text-xs">
                       <button
                         onClick={() => {
-                          deleteAtt.mutate({ attachment: att, entityType, entityId })
-                          setConfirmDeleteId(null)
+                          deleteAtt.mutate(
+                            { attachment: att, entityType, entityId },
+                            {
+                              onError: (err) => setUploadError(err.message),
+                              onSettled: () => setConfirmDeleteId(null),
+                            }
+                          )
                         }}
                         className="text-red-500 hover:text-red-400 font-medium"
                         disabled={deleteAtt.isPending}
