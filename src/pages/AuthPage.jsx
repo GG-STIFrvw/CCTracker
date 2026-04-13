@@ -312,28 +312,28 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-3">
-            <OwlIcon className="w-16 h-16" />
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
-            CC <span className="text-[#9FE870]">Tracker</span>
-          </p>
-          {tab === 'login' && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 tracking-wide">
-              Control Your Cards. Track Every Debt.
+        {/* Card — logo, brand, title, and form all inside */}
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl px-8 pt-8 pb-6 shadow-xl">
+          {/* Logo + brand */}
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-3">
+              <OwlIcon className="w-16 h-16" />
+            </div>
+            <p className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+              CC <span className="text-[#9FE870]">Tracker</span>
             </p>
-          )}
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-5">{titles[tab]}</h1>
-          <p className="text-gray-500 dark:text-gray-500 text-sm mt-1">
-            {tab === 'register' && 'Get started for free'}
-            {tab === 'forgot' && "We'll send you a reset link"}
-          </p>
-        </div>
+          </div>
 
-        {/* Card */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-xl">
+          {/* Title + subtitle */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{titles[tab]}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              {tab === 'login' && 'Control Your Cards. Track Every Debt.'}
+              {tab === 'register' && 'Get started for free'}
+              {tab === 'forgot' && "We'll send you a reset link"}
+            </p>
+          </div>
+
           {tab === 'login' && (
             <LoginForm
               onSwitch={() => setTab('register')}
