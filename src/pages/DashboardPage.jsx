@@ -135,13 +135,25 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Expenses</h1>
               <p className="text-gray-500 dark:text-gray-500 text-sm mt-0.5">
-                <span className="font-mono">{formatPeso(thisMonthTotal)}</span> this {MONTH_NAME}
+                {thisMonthExpenses.length} expense{thisMonthExpenses.length !== 1 ? 's' : ''} this month
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" onClick={() => navigate('/expenses')}>View All</Button>
-              <Button onClick={() => setShowAddExpense(true)}>+ Add Expense</Button>
-            </div>
+            <Button onClick={() => setShowAddExpense(true)}>+ Add Expense</Button>
+          </div>
+
+          <div
+            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow max-w-xs"
+            onClick={() => navigate('/expenses')}
+          >
+            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">
+              {MONTH_NAME.toUpperCase()}
+            </p>
+            <p className="text-3xl font-black font-mono text-red-600 dark:text-red-400">
+              {formatPeso(thisMonthTotal)}
+            </p>
+            <p className="text-xs text-gray-400 mt-3 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              View all expenses →
+            </p>
           </div>
         </div>
       </main>
