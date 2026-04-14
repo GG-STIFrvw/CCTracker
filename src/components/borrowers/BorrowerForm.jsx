@@ -1,16 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { borrowerSchema } from '../../lib/zod-schemas.js'
-import { useAddBorrower, useUpdateBorrower } from '../../hooks/useBorrowers.js'
+import { useAddBorrower, useUpdateBorrower, useArchiveBorrower } from '../../hooks/useBorrowers.js'
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
+import { TrashIcon } from '../ui/icons.jsx'
 
 export default function BorrowerForm({ borrower = null, onClose, onSuccess }) {
   const isEditing = !!borrower
   const addBorrower = useAddBorrower()
   const updateBorrower = useUpdateBorrower()
+  const archiveBorrower = useArchiveBorrower()
   const mutation = isEditing ? updateBorrower : addBorrower
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const {
     register,
@@ -68,7 +71,42 @@ export default function BorrowerForm({ borrower = null, onClose, onSuccess }) {
           <p className="text-red-500 text-sm">{mutation.error.message}</p>
         )}
 
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 pt-2 items-center">
+          {isEditing && (
+            confirmDelete ? (
+              <div className="flex items-center gap-2 mr-auto">
+                <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Delete borrower?</span>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await archiveBorrower.mutateAsync(borrower.id)
+                    onClose()
+                  }}
+                  className="text-xs text-red-500 hover:text-red-600 font-semibold transition-colors"
+                  disabled={archiveBorrower.isPending}
+                >
+                  Yes
+                </button>
+                <span className="text-gray-300 dark:text-gray-600">/</span>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  No
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mr-auto"
+                title="Delete borrower"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
+            )
+          )}
           <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
             Cancel
           </Button>
