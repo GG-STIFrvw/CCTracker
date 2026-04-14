@@ -95,3 +95,21 @@ export const loanPaymentSchema = z.object({
     .positive('Amount must be greater than 0'),
   notes: z.string().optional(),
 })
+
+export const expenseSchema = z.object({
+  expense_date: z.string().min(1, 'Date is required'),
+  category: z.enum([
+    'utilities','food','transportation','rent','healthcare',
+    'shopping','entertainment','subscriptions','education',
+    'personal_care','insurance','others',
+  ], { required_error: 'Category is required' }),
+  description: z.string().min(1, 'Description is required'),
+  amount: z.coerce
+    .number({ invalid_type_error: 'Must be a number' })
+    .positive('Amount must be greater than 0'),
+  payment_method: z.enum(
+    ['cash','gcash','maya','bank_transfer','others'],
+    { required_error: 'Payment method is required' }
+  ),
+  notes: z.string().optional(),
+})

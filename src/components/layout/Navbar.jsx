@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import useAppStore from '../../store/useAppStore.js'
 import Button from '../ui/Button.jsx'
-import { SunIcon, MoonIcon, OwlIcon } from '../ui/icons.jsx'
+import { SunIcon, MoonIcon, OwlIcon, ExpensesIcon } from '../ui/icons.jsx'
 import { usePendingInvites } from '../../hooks/useShares.js'
 import { usePendingBorrowerInvites } from '../../hooks/useBorrowerShares.js'
 
@@ -72,6 +72,20 @@ export default function Navbar() {
               {pendingBorrowerInvites.length}
             </span>
           )}
+        </button>
+      )}
+
+      {/* Expenses link */}
+      {user && (
+        <button
+          onClick={() => navigate('/expenses')}
+          className={`relative text-sm px-3 py-1.5 rounded-lg transition-colors ${
+            location.pathname === '/expenses'
+              ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
+              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
+        >
+          Expenses
         </button>
       )}
 

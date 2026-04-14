@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar.jsx'
 import CardTile from '../components/cards/CardTile.jsx'
 import CardForm from '../components/cards/CardForm.jsx'
@@ -11,6 +12,10 @@ import BorrowerTile from '../components/borrowers/BorrowerTile.jsx'
 import BorrowerForm from '../components/borrowers/BorrowerForm.jsx'
 import { useBorrowers } from '../hooks/useBorrowers.js'
 import { BalanceIcon, CreditCardIcon } from '../components/ui/icons.jsx'
+import { useExpenses } from '../hooks/useExpenses.js'
+import { filterByMonth } from '../utils/expenses.js'
+import { addMoney, formatPeso } from '../utils/money.js'
+import ExpenseForm from '../components/expenses/ExpenseForm.jsx'
 
 export default function DashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -22,6 +27,15 @@ export default function DashboardPage() {
   const { data: borrowers = [], isLoading: loadingBorrowers } = useBorrowers()
   const [showAddBorrower, setShowAddBorrower] = useState(false)
   const [editingBorrower, setEditingBorrower] = useState(null)
+
+  const navigate = useNavigate()
+  const { data: allExpenses = [] } = useExpenses()
+  const [showAddExpense, setShowAddExpense] = useState(false)
+
+  const now = new Date()
+  const thisMonthExpenses = filterByMonth(allExpenses, now.getFullYear(), now.getMonth() + 1)
+  const thisMonthTotal = thisMonthExpenses.reduce((sum, e) => addMoney(sum, e.amount), 0)
+  const MONTH_NAME = now.toLocaleString('en-PH', { month: 'long' })
 
   // Only show cards owned by this user on the dashboard
   const ownCards = cards.filter((c) => c.user_id === user?.id)
@@ -114,6 +128,22 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
+
+        {/* Expenses section */}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Expenses</h1>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-0.5">
+                <span className="font-mono">{formatPeso(thisMonthTotal)}</span> this {MONTH_NAME}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="ghost" onClick={() => navigate('/expenses')}>View All</Button>
+              <Button onClick={() => setShowAddExpense(true)}>+ Add Expense</Button>
+            </div>
+          </div>
+        </div>
       </main>
 
       {showAdd && (
@@ -144,6 +174,13 @@ export default function DashboardPage() {
           borrower={editingBorrower}
           onClose={() => setEditingBorrower(null)}
           onSuccess={() => toast('Borrower updated!', 'success')}
+        />
+      )}
+
+      {showAddExpense && (
+        <ExpenseForm
+          onClose={() => setShowAddExpense(false)}
+          onSuccess={() => toast('Expense added!', 'success')}
         />
       )}
 
