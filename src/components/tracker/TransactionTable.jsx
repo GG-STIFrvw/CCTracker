@@ -5,7 +5,7 @@ import { useTransactionAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
 import Badge from '../ui/Badge.jsx'
 import Button from '../ui/Button.jsx'
-import { AttachmentIcon } from '../ui/icons.jsx'
+import { AttachmentIcon, EditIcon } from '../ui/icons.jsx'
 
 function formatDate(dateStr) {
   if (!dateStr) return '—'
@@ -16,7 +16,16 @@ function formatDate(dateStr) {
   })
 }
 
-export default function TransactionTable({ transactions, cardId, onPay, readOnly = false }) {
+export default function TransactionTable({
+  transactions,
+  cardId,
+  onPay,
+  readOnly = false,
+  bulkPayMode = false,
+  selectedIds = new Set(),
+  onToggleSelect,
+  onEdit,
+}) {
   const archive = useArchiveTransaction()
   const [confirmArchiveId, setConfirmArchiveId] = useState(null)
   const [attachingTxId, setAttachingTxId] = useState(null)
@@ -38,6 +47,9 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
+              {bulkPayMode && !readOnly && (
+                <th className="px-4 py-3 text-center whitespace-nowrap w-10"></th>
+              )}
               <th className="px-4 py-3 text-left whitespace-nowrap">Date</th>
               <th className="px-4 py-3 text-right whitespace-nowrap">Amount</th>
               <th className="px-4 py-3 text-left whitespace-nowrap">Due Date</th>
@@ -54,8 +66,24 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {transactions.map((t) => {
               const count = attCounts[t.id] || 0
+              const isSelectable = bulkPayMode && !readOnly && t.payment_status !== 'paid'
+              const isSelected = selectedIds.has(t.id)
               return (
                 <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-gray-700 dark:text-gray-200">
+                  {bulkPayMode && !readOnly && (
+                    <td className="px-4 py-3 text-center">
+                      {isSelectable ? (
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => onToggleSelect?.(t)}
+                          className="accent-[#2D6A4F] dark:accent-[#9FE870] w-4 h-4 cursor-pointer"
+                        />
+                      ) : (
+                        <span className="text-[#2D6A4F] dark:text-[#9FE870] text-xs">✓</span>
+                      )}
+                    </td>
+                  )}
                   <td className="px-4 py-3 whitespace-nowrap">{formatDate(t.transaction_date)}</td>
                   <td className="px-4 py-3 text-right font-mono">{formatPeso(t.amount)}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400">
@@ -92,6 +120,13 @@ export default function TransactionTable({ transactions, cardId, onPay, readOnly
                   {!readOnly && (
                     <td className="px-4 py-3 text-center">
                       <div className="flex gap-2 justify-center items-center">
+                        <button
+                          onClick={() => onEdit?.(t)}
+                          className="text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
+                          title="Edit transaction"
+                        >
+                          <EditIcon className="w-3.5 h-3.5" />
+                        </button>
                         {t.payment_status !== 'paid' && (
                           <Button
                             variant="ghost"
