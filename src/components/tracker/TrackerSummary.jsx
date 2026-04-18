@@ -12,11 +12,11 @@ function calcTotals(transactions = []) {
   )
 }
 
-function StatBox({ label, value, colorClass }) {
+function StatBox({ label, value, colorClass, className = '' }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${className}`}>
       <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</p>
-      <p className={`text-2xl font-black font-mono ${colorClass}`}>{formatPeso(value)}</p>
+      <p className={`text-lg sm:text-2xl font-black font-mono ${colorClass}`}>{formatPeso(value)}</p>
     </div>
   )
 }
@@ -35,10 +35,15 @@ export default function TrackerSummary({ card, transactions }) {
           <h2 className="text-gray-900 dark:text-white font-semibold">{card.nickname}</h2>
           <span className="text-gray-500 dark:text-gray-500 text-sm">· {card.bank_name}</span>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <StatBox label="Total Charged" value={totalSpent} colorClass="text-gray-900 dark:text-white" />
           <StatBox label="Total Paid" value={totalPaid} colorClass="text-green-600 dark:text-green-400" />
-          <StatBox label="Outstanding" value={totalRemaining} colorClass="text-red-600 dark:text-red-400" />
+          <StatBox
+            label="Outstanding"
+            value={totalRemaining}
+            colorClass="text-red-600 dark:text-red-400"
+            className="col-span-2 sm:col-span-1"
+          />
         </div>
       </div>
     </div>
