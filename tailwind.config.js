@@ -6,7 +6,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Electrolize', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        mono: ['Roboto Mono', 'monospace'],
       },
       keyframes: {
         'fade-in': {
