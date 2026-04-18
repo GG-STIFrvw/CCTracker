@@ -113,3 +113,12 @@ export const expenseSchema = z.object({
   ),
   notes: z.string().optional(),
 })
+
+export const billingCycleSchema = z.object({
+  label: z.string().min(1, 'Label is required'),
+  start_date: z.string().min(1, 'Start date is required'),
+  end_date: z.string().min(1, 'End date is required'),
+}).refine(d => d.end_date >= d.start_date, {
+  message: 'End date must be on or after start date',
+  path: ['end_date'],
+})
