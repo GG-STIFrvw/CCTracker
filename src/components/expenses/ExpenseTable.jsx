@@ -69,17 +69,17 @@ export default function ExpenseTable({ expenses, onEdit }) {
               </Button>
               {confirmArchiveId === e.id ? (
                 <span className="flex items-center gap-1">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Archive?</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Archive?</span>
                   <button
                     onClick={() => { archive.mutate(e.id); setConfirmArchiveId(null) }}
-                    className="text-xs text-red-500 font-medium"
+                    className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
                     disabled={archive.isPending}
                     aria-label="Confirm archive"
                   >Yes</button>
                   <span className="text-gray-300 dark:text-gray-600">/</span>
                   <button
                     onClick={() => setConfirmArchiveId(null)}
-                    className="text-xs text-gray-400"
+                    className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                     aria-label="Cancel archive"
                   >No</button>
                 </span>
@@ -88,6 +88,7 @@ export default function ExpenseTable({ expenses, onEdit }) {
                   onClick={() => setConfirmArchiveId(e.id)}
                   className="text-xs text-gray-400 hover:text-red-500 ml-auto transition-colors"
                   disabled={archive.isPending}
+                  aria-label={`Archive ${e.description}`}
                 >
                   Archive
                 </button>
@@ -134,7 +135,7 @@ export default function ExpenseTable({ expenses, onEdit }) {
                   <div className="flex gap-2 justify-center items-center">
                     <Button
                       variant="ghost"
-                      className="text-xs py-1 px-2"
+                      className="text-xs py-1 px-2.5"
                       onClick={() => onEdit(e)}
                     >
                       Edit
@@ -164,6 +165,7 @@ export default function ExpenseTable({ expenses, onEdit }) {
                         onClick={() => setConfirmArchiveId(e.id)}
                         className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
                         disabled={archive.isPending}
+                        aria-label={`Archive ${e.description}`}
                       >
                         Archive
                       </button>
