@@ -309,7 +309,7 @@ export function EditIcon({ className, ...props }) {
   )
 }
 
-export function HomeIcon({ className, ...props }) {
+export function HomeIcon({ className = '', ...props }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -320,6 +320,7 @@ export function HomeIcon({ className, ...props }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
+      aria-hidden="true"
       {...props}
     >
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -328,7 +329,7 @@ export function HomeIcon({ className, ...props }) {
   )
 }
 
-export function UsersIcon({ className, ...props }) {
+export function UsersIcon({ className = '', ...props }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -339,6 +340,7 @@ export function UsersIcon({ className, ...props }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
+      aria-hidden="true"
       {...props}
     >
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -349,7 +351,7 @@ export function UsersIcon({ className, ...props }) {
   )
 }
 
-export function ShareIcon({ className, ...props }) {
+export function ShareIcon({ className = '', ...props }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -360,6 +362,7 @@ export function ShareIcon({ className, ...props }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
+      aria-hidden="true"
       {...props}
     >
       <circle cx="18" cy="5" r="3" />
