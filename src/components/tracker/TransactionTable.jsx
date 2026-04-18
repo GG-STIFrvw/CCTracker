@@ -41,14 +41,18 @@ export default function TransactionTable({
     )
   }
 
+  const rows = transactions.map((t) => ({
+    t,
+    count: attCounts[t.id] || 0,
+    isSelectable: bulkPayMode && !readOnly && t.payment_status !== 'paid',
+    isSelected: selectedIds.has(t.id),
+  }))
+
   return (
     <>
       {/* ── Mobile card list (below md) ──────────────────────────────── */}
       <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
-        {transactions.map((t) => {
-          const count = attCounts[t.id] || 0
-          const isSelectable = bulkPayMode && !readOnly && t.payment_status !== 'paid'
-          const isSelected = selectedIds.has(t.id)
+        {rows.map(({ t, count, isSelectable, isSelected }) => {
           return (
             <div key={t.id} className="bg-white dark:bg-gray-900 px-4 py-3">
               {/* Row 1: date + status */}
@@ -90,6 +94,7 @@ export default function TransactionTable({
                     <button
                       onClick={() => setAttachingTxId(t.id)}
                       className="flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] text-xs transition-colors"
+                      aria-label={`${count} attachment${count !== 1 ? 's' : ''}`}
                     >
                       <AttachmentIcon className="w-4 h-4" />
                       <span>{count}</span>
@@ -117,9 +122,10 @@ export default function TransactionTable({
                           onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
                           className="text-xs text-red-500 font-medium"
                           disabled={archive.isPending}
+                          aria-label="Confirm archive"
                         >Yes</button>
                         <span className="text-gray-300 dark:text-gray-600">/</span>
-                        <button onClick={() => setConfirmArchiveId(null)} className="text-xs text-gray-400">No</button>
+                        <button onClick={() => setConfirmArchiveId(null)} className="text-xs text-gray-400" aria-label="Cancel archive">No</button>
                       </span>
                     ) : (
                       <button
@@ -134,10 +140,14 @@ export default function TransactionTable({
               {readOnly && count > 0 && (
                 <button
                   onClick={() => setAttachingTxId(t.id)}
-                  className="flex items-center gap-1 text-gray-400 text-xs"
+                  className="flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] text-xs transition-colors"
+                  title="Attachments"
+                  aria-label={`${count} attachment${count !== 1 ? 's' : ''}`}
                 >
                   <AttachmentIcon className="w-4 h-4" />
-                  <span>{count}</span>
+                  <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
+                    {count}
+                  </span>
                 </button>
               )}
             </div>
@@ -167,10 +177,7 @@ export default function TransactionTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {transactions.map((t) => {
-              const count = attCounts[t.id] || 0
-              const isSelectable = bulkPayMode && !readOnly && t.payment_status !== 'paid'
-              const isSelected = selectedIds.has(t.id)
+            {rows.map(({ t, count, isSelectable, isSelected }) => {
               return (
                 <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-gray-700 dark:text-gray-200">
                   {bulkPayMode && !readOnly && (
@@ -210,6 +217,7 @@ export default function TransactionTable({
                         onClick={() => setAttachingTxId(t.id)}
                         className="relative inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs"
                         title="Attachments"
+                        aria-label={`${count} attachment${count !== 1 ? 's' : ''}`}
                       >
                         <AttachmentIcon className="w-4 h-4" />
                         {count > 0 && (
@@ -227,6 +235,7 @@ export default function TransactionTable({
                           onClick={() => onEdit?.(t)}
                           className="text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
                           title="Edit transaction"
+                          aria-label="Edit transaction"
                         >
                           <EditIcon className="w-3.5 h-3.5" />
                         </button>
@@ -246,6 +255,7 @@ export default function TransactionTable({
                               onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
                               className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
                               disabled={archive.isPending}
+                              aria-label="Confirm archive"
                             >
                               Yes
                             </button>
@@ -253,6 +263,7 @@ export default function TransactionTable({
                             <button
                               onClick={() => setConfirmArchiveId(null)}
                               className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                              aria-label="Cancel archive"
                             >
                               No
                             </button>
