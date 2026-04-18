@@ -104,9 +104,11 @@ export default function Navbar() {
           >
             {isDark ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
           </button>
-          <Button variant="ghost" onClick={signOut} className="text-sm">
-            Sign Out
-          </Button>
+          {user && (
+            <Button variant="ghost" onClick={signOut} className="text-sm">
+              Sign Out
+            </Button>
+          )}
         </div>
       </nav>
 
@@ -118,19 +120,21 @@ export default function Navbar() {
               <button
                 key={path}
                 onClick={() => navigate(path)}
-                className={`relative flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-colors ${
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-colors ${
                   isActive(path)
                     ? 'text-[#2D6A4F] dark:text-[#9FE870]'
                     : 'text-gray-400 dark:text-gray-500'
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <div className="relative">
+                  <Icon className="w-5 h-5" />
+                  {badge > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center leading-none">
+                      {badge}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] leading-tight">{label}</span>
-                {badge > 0 && (
-                  <span className="absolute top-1.5 right-[calc(50%-14px)] bg-red-500 text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center leading-none">
-                    {badge}
-                  </span>
-                )}
               </button>
             ))}
           </div>
