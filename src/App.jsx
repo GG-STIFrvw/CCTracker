@@ -52,14 +52,16 @@ export default function App() {
     }
 
     // ── Normal page load (no OAuth hash) ──────────────────────────────
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null)
-      setSessionLoaded(true)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // onAuthStateChange fires INITIAL_SESSION immediately on subscribe,
+    // so we don't need a separate getSession() call. Using both caused a
+    // race where queryClient.clear() wiped data right after sessionLoaded
+    // was set, producing a white screen on hard refresh.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
-      queryClient.clear()
+      setSessionLoaded(true)
+      if (event !== 'INITIAL_SESSION') {
+        queryClient.clear()
+      }
       if (session?.user) {
         supabase.rpc('claim_pending_shares')
           .then(() => queryClient.invalidateQueries({ queryKey: ['pending-invites'] }))
