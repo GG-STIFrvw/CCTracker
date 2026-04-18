@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
 function ProtectedRoute({ children }) {
   const user = useAppStore((s) => s.user)
   if (!user) return <Navigate to="/auth" replace />
-  return children
+  return <div className="pb-16 md:pb-0">{children}</div>
 }
 
 export default function App() {
