@@ -2,15 +2,15 @@ import { getRemainingBalance } from './money.js'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-const CSV_HEADERS = ['Date', 'Amount (PHP)', 'Due Date', 'Paid (PHP)', 'Remaining (PHP)', 'Status', 'Notes']
+export const CSV_HEADERS = ['Date', 'Amount (PHP)', 'Due Date', 'Paid (PHP)', 'Remaining (PHP)', 'Status', 'Notes']
 
 export function buildCSVContent(transactions) {
   const rows = transactions.map(t => [
     t.transaction_date || '',
     t.amount,
     t.payment_due_date || '',
-    t.amount_paid,
-    getRemainingBalance(t.amount, t.amount_paid),
+    t.amount_paid ?? 0,
+    getRemainingBalance(t.amount, t.amount_paid ?? 0),
     t.payment_status,
     t.notes || '',
   ])
@@ -47,8 +47,8 @@ export function exportPDF(transactions, filename, title = 'Transactions') {
       t.transaction_date || '—',
       `PHP ${Number(t.amount).toFixed(2)}`,
       t.payment_due_date || '—',
-      `PHP ${Number(t.amount_paid).toFixed(2)}`,
-      `PHP ${getRemainingBalance(t.amount, t.amount_paid).toFixed(2)}`,
+      `PHP ${Number(t.amount_paid ?? 0).toFixed(2)}`,
+      `PHP ${getRemainingBalance(t.amount, t.amount_paid ?? 0).toFixed(2)}`,
       t.payment_status,
       t.notes || '—',
     ]),
