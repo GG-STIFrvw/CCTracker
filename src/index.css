@@ -6,4 +6,8 @@
   body {
     @apply font-sans;
   }
+
+  .font-mono {
+    font-feature-settings: "zero" 0;
+  }
 }
