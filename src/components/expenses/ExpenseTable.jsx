@@ -40,7 +40,65 @@ export default function ExpenseTable({ expenses, onEdit }) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
+      {/* ── Mobile card list (below md) ──────────────────────────────── */}
+      <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+        {expenses.map((e) => (
+          <div key={e.id} className="bg-white dark:bg-gray-900 px-4 py-3">
+            {/* Row 1: date + category badge */}
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <span className="text-xs text-gray-500 dark:text-gray-400">{formatDate(e.expense_date)}</span>
+              <CategoryBadge category={e.category} />
+            </div>
+            {/* Row 2: description + amount */}
+            <div className="flex items-baseline justify-between mb-1">
+              <span className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[180px]">{e.description}</span>
+              <span className="text-base font-mono font-bold text-red-600 dark:text-red-400 ml-2 flex-shrink-0">{formatPeso(e.amount)}</span>
+            </div>
+            {/* Row 3: payment method + notes */}
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-2.5">
+              {getPaymentMethodLabel(e.payment_method)}{e.notes ? ` · ${e.notes}` : ''}
+            </p>
+            {/* Row 4: actions */}
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="ghost"
+                className="text-xs py-1 px-2.5"
+                onClick={() => onEdit(e)}
+              >
+                Edit
+              </Button>
+              {confirmArchiveId === e.id ? (
+                <span className="flex items-center gap-1">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Archive?</span>
+                  <button
+                    onClick={() => { archive.mutate(e.id); setConfirmArchiveId(null) }}
+                    className="text-xs text-red-500 font-medium"
+                    disabled={archive.isPending}
+                    aria-label="Confirm archive"
+                  >Yes</button>
+                  <span className="text-gray-300 dark:text-gray-600">/</span>
+                  <button
+                    onClick={() => setConfirmArchiveId(null)}
+                    className="text-xs text-gray-400"
+                    aria-label="Cancel archive"
+                  >No</button>
+                </span>
+              ) : (
+                <button
+                  onClick={() => setConfirmArchiveId(e.id)}
+                  className="text-xs text-gray-400 hover:text-red-500 ml-auto transition-colors"
+                  disabled={archive.isPending}
+                >
+                  Archive
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Desktop table (md and up) ─────────────────────────────────── */}
+      <div className="hidden md:block overflow-x-auto rounded-2xl border border-gray-200 dark:border-gray-700">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">
@@ -88,6 +146,7 @@ export default function ExpenseTable({ expenses, onEdit }) {
                           onClick={() => { archive.mutate(e.id); setConfirmArchiveId(null) }}
                           className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
                           disabled={archive.isPending}
+                          aria-label="Confirm archive"
                         >
                           Yes
                         </button>
@@ -95,6 +154,7 @@ export default function ExpenseTable({ expenses, onEdit }) {
                         <button
                           onClick={() => setConfirmArchiveId(null)}
                           className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                          aria-label="Cancel archive"
                         >
                           No
                         </button>
