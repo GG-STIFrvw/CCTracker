@@ -52,9 +52,13 @@ export default function CloseCycleModal({ cardId, transactions, onClose, onSucce
   })
 
   async function onSubmit(data) {
-    await closeCycle.mutateAsync({ cardId, ...data })
-    onSuccess?.()
-    onClose()
+    try {
+      await closeCycle.mutateAsync({ cardId, ...data })
+      onSuccess?.()
+      onClose()
+    } catch {
+      // error displayed via closeCycle.isError banner
+    }
   }
 
   return (

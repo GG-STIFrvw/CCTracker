@@ -60,9 +60,13 @@ export default function TrackerPage() {
 
   async function handlePaySelected() {
     if (selectedTransactions.length === 0) return
-    await payBulk.mutateAsync({ transactions: selectedTransactions })
-    toast(`${selectedTransactions.length} transaction${selectedTransactions.length !== 1 ? 's' : ''} marked as paid`, 'success')
-    exitBulkPay()
+    try {
+      await payBulk.mutateAsync({ cardId, transactions: selectedTransactions })
+      toast(`${selectedTransactions.length} transaction${selectedTransactions.length !== 1 ? 's' : ''} marked as paid`, 'success')
+      exitBulkPay()
+    } catch {
+      toast('Payment failed. Please try again.', 'error')
+    }
   }
 
   const exportFilename = card ? `${card.nickname}-active-transactions`.replace(/\s+/g, '-') : 'transactions'
@@ -223,7 +227,6 @@ export default function TrackerPage() {
           transactions={transactions}
           onClose={() => setShowCloseCycle(false)}
           onSuccess={() => {
-            setShowCloseCycle(false)
             toast('Billing cycle closed!', 'success')
             setActiveTab('history')
           }}

@@ -14,9 +14,10 @@ function formatDate(dateStr) {
 }
 
 function CycleCard({ cycle, cardName, isExpanded, onToggle }) {
-  const totalCharged = cycle.transactions.reduce((sum, t) => sum + Number(t.amount), 0)
-  const totalPaid = cycle.transactions.reduce((sum, t) => sum + Number(t.amount_paid), 0)
-  const count = cycle.transactions.length
+  const txList = cycle.transactions ?? []
+  const totalCharged = txList.reduce((sum, t) => sum + Number(t.amount), 0)
+  const totalPaid = txList.reduce((sum, t) => sum + Number(t.amount_paid), 0)
+  const count = txList.length
 
   const { data: fullTransactions = [], isLoading } = useCycleTransactions(isExpanded ? cycle.id : null)
 

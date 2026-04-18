@@ -114,7 +114,8 @@ export function usePaymentHistory(transactionId) {
 export function useEditTransaction() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, cardId, data }) => {
+    mutationFn: async ({ id, cardId, data, currentAmountPaid }) => {
+      const newStatus = getPaymentStatus(data.amount, currentAmountPaid)
       const { error } = await supabase
         .from('transactions')
         .update({
@@ -122,6 +123,7 @@ export function useEditTransaction() {
           amount: data.amount,
           payment_due_date: data.payment_due_date || null,
           notes: data.notes || '',
+          payment_status: newStatus,
         })
         .eq('id', id)
       if (error) throw error
@@ -135,7 +137,8 @@ export function useEditTransaction() {
 export function usePayBulk() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ transactions }) => {
+    mutationFn: async ({ cardId, transactions }) => {
+      if (!transactions?.length) throw new Error('No transactions selected')
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -163,10 +166,10 @@ export function usePayBulk() {
         })
       )
 
-      return { cardId: transactions[0].card_id }
+      return { cardId }
     },
-    onSuccess: (_data, { transactions }) =>
-      qc.invalidateQueries({ queryKey: ['transactions', transactions[0].card_id] }),
+    onSuccess: (_data, { cardId }) =>
+      qc.invalidateQueries({ queryKey: ['transactions', cardId] }),
   })
 }
 

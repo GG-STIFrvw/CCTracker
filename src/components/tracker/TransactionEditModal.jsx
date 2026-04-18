@@ -56,9 +56,13 @@ export default function TransactionEditModal({ transaction, card, transactions, 
   })
 
   async function onSubmit(data) {
-    await editTransaction.mutateAsync({ id: transaction.id, cardId: transaction.card_id, data })
-    onSuccess?.()
-    onClose()
+    try {
+      await editTransaction.mutateAsync({ id: transaction.id, cardId: transaction.card_id, data, currentAmountPaid: transaction.amount_paid })
+      onSuccess?.()
+      onClose()
+    } catch {
+      // error displayed via editTransaction.isError banner
+    }
   }
 
   return (
