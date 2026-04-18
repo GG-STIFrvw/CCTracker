@@ -4,7 +4,7 @@ export const CATEGORIES = [
   { value: 'utilities',     label: 'Utilities',        color: '#3B82F6' },
   { value: 'food',          label: 'Food & Dining',    color: '#F59E0B' },
   { value: 'transportation',label: 'Transportation',   color: '#8B5CF6' },
-  { value: 'rent',          label: 'Rent / Housing',   color: '#EC4899' },
+  { value: 'rent',          label: 'Rent',             color: '#EC4899' },
   { value: 'healthcare',    label: 'Healthcare',       color: '#EF4444' },
   { value: 'shopping',      label: 'Shopping',         color: '#F97316' },
   { value: 'entertainment', label: 'Entertainment',    color: '#06B6D4' },
