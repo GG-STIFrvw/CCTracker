@@ -23,7 +23,10 @@ export default function SharedBorrowersPage() {
       <Navbar />
 
       <main className="max-w-6xl mx-auto p-6">
-        <div className="flex justify-end mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            Borrowers shared with me
+          </h2>
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -80,9 +83,6 @@ export default function SharedBorrowersPage() {
 
         {/* Shared borrowers grid */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-            Borrowers shared with me
-          </h2>
           {activeShares.length === 0 ? (
             <div className="text-center py-24 border border-dashed border-gray-300 dark:border-gray-700 rounded-2xl">
               <div className="flex justify-center mb-3">
