@@ -155,6 +155,7 @@ export default function TrackerPage() {
                   <button
                     key={s}
                     onClick={() => setStatusFilter(s)}
+                    aria-pressed={statusFilter === s}
                     className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${
                       statusFilter === s
                         ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
@@ -175,7 +176,7 @@ export default function TrackerPage() {
                   className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
                   aria-label="From date"
                 />
-                <span>—</span>
+                <span aria-hidden="true">—</span>
                 <input
                   type="date"
                   value={dateTo}
@@ -183,9 +184,9 @@ export default function TrackerPage() {
                   className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
                   aria-label="To date"
                 />
-                {(dateFrom || dateTo) && (
+                {(dateFrom || dateTo || statusFilter !== 'all') && (
                   <button
-                    onClick={() => { setDateFrom(''); setDateTo('') }}
+                    onClick={() => { setDateFrom(''); setDateTo(''); setStatusFilter('all') }}
                     className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
                   >
                     Clear
