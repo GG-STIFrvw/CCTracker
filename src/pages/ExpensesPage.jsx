@@ -16,7 +16,6 @@ import ExpenseTable from '../components/expenses/ExpenseTable.jsx'
 import ExpenseForm from '../components/expenses/ExpenseForm.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
-import { ReturnIcon } from '../components/ui/icons.jsx'
 
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
@@ -76,39 +75,31 @@ export default function ExpensesPage() {
         total={monthTotal}
         paymentTotals={paymentTotals}
         monthLabel={monthLabel}
+        onBack={() => navigate('/')}
       />
 
       <main className="max-w-6xl mx-auto p-6">
-        {/* Back + Add */}
+        {/* Month navigator + Add */}
         <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            <ReturnIcon className="w-3.5 h-3.5" />
-            Back to Dashboard
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevMonth}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              ‹
+            </button>
+            <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-sm font-semibold px-3 py-1 rounded-full">
+              {monthLabel}
+            </span>
+            <button
+              onClick={nextMonth}
+              disabled={isCurrentMonth}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              ›
+            </button>
+          </div>
           <Button onClick={() => setShowForm(true)}>+ Add Expense</Button>
-        </div>
-
-        {/* Month navigator */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={prevMonth}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            ‹
-          </button>
-          <span className="text-sm font-semibold text-gray-900 dark:text-white w-36 text-center">
-            {monthLabel}
-          </span>
-          <button
-            onClick={nextMonth}
-            disabled={isCurrentMonth}
-            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            ›
-          </button>
         </div>
 
         {/* Category tiles */}
