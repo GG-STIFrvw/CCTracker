@@ -20,6 +20,7 @@ describe('getDueDateStatus', () => {
   it('returns due-soon for today', () => {
     const today = new Date().toISOString().split('T')[0]
     expect(getDueDateStatus(today, 'unpaid')).toBe('due-soon')
+    expect(getDueDateStatus(today, 'partial')).toBe('due-soon')
   })
 
   it('returns due-soon for dates within 7 days', () => {
