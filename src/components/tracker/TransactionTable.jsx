@@ -47,13 +47,14 @@ export default function TransactionTable({
     count: attCounts[t.id] || 0,
     isSelectable: bulkPayMode && !readOnly && t.payment_status !== 'paid',
     isSelected: selectedIds.has(t.id),
+    dueDateStatus: getDueDateStatus(t.payment_due_date, t.payment_status),
   }))
 
   return (
     <>
       {/* ── Mobile card list (below md) ──────────────────────────────── */}
       <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
-        {rows.map(({ t, count, isSelectable, isSelected }) => {
+        {rows.map(({ t, count, isSelectable, isSelected, dueDateStatus }) => {
           return (
             <div key={t.id} className="bg-white dark:bg-gray-900 px-4 py-3">
               {/* Row 1: date + status */}
@@ -86,11 +87,11 @@ export default function TransactionTable({
               <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-2.5 flex-wrap">
                 {t.payment_due_date && (
                   <span className={
-                    getDueDateStatus(t.payment_due_date, t.payment_status) === 'overdue'
+                    dueDateStatus === 'overdue'
                       ? 'text-red-600 dark:text-red-400 font-semibold'
-                      : getDueDateStatus(t.payment_due_date, t.payment_status) === 'due-soon'
+                      : dueDateStatus === 'due-soon'
                       ? 'text-orange-500 dark:text-orange-400'
-                      : ''
+                      : 'text-gray-500 dark:text-gray-400'
                   }>
                     Due {formatDate(t.payment_due_date)}
                   </span>
@@ -188,7 +189,7 @@ export default function TransactionTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-            {rows.map(({ t, count, isSelectable, isSelected }) => {
+            {rows.map(({ t, count, isSelectable, isSelected, dueDateStatus }) => {
               return (
                 <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors text-gray-700 dark:text-gray-200">
                   {bulkPayMode && !readOnly && (
@@ -208,9 +209,9 @@ export default function TransactionTable({
                   <td className="px-4 py-3 whitespace-nowrap">{formatDate(t.transaction_date)}</td>
                   <td className="px-4 py-3 text-right font-mono">{formatPeso(t.amount)}</td>
                   <td className={`px-4 py-3 whitespace-nowrap ${
-                    getDueDateStatus(t.payment_due_date, t.payment_status) === 'overdue'
+                    dueDateStatus === 'overdue'
                       ? 'text-red-600 dark:text-red-400 font-semibold'
-                      : getDueDateStatus(t.payment_due_date, t.payment_status) === 'due-soon'
+                      : dueDateStatus === 'due-soon'
                       ? 'text-orange-500 dark:text-orange-400'
                       : 'text-gray-500 dark:text-gray-400'
                   }`}>
