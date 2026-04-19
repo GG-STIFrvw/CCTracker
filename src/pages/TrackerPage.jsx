@@ -105,22 +105,15 @@ export default function TrackerPage() {
       <TrackerSummary card={card} transactions={transactions} />
 
       <main className="max-w-6xl mx-auto p-6">
-        <button
-          onClick={() => navigate(readOnly ? '/shared' : '/')}
-          className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-6"
-        >
-          <ReturnIcon className="w-3.5 h-3.5" />
-          Back to {readOnly ? 'Shared with me' : 'Dashboard'}
-        </button>
-
         {readOnly && (
           <div className="mb-4 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
             Viewing shared card — read only
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-1 border-b border-gray-200 dark:border-gray-700 mb-6">
+        {/* Tabs + Back button on same row */}
+        <div className="flex items-end justify-between border-b border-gray-200 dark:border-gray-700 mb-6">
+          <div className="flex gap-1">
           {['active', 'history'].map(tab => (
             <button
               key={tab}
@@ -134,6 +127,14 @@ export default function TrackerPage() {
               {tab}
             </button>
           ))}
+          </div>
+          <button
+            onClick={() => navigate(readOnly ? '/shared' : '/')}
+            className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-1"
+          >
+            <ReturnIcon className="w-3.5 h-3.5" />
+            Back to {readOnly ? 'Shared with me' : 'Dashboard'}
+          </button>
         </div>
 
         {activeTab === 'active' && (
