@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { formatPeso, getRemainingBalance } from '../../utils/money.js'
+import { getDueDateStatus } from '../../utils/dates.js'
 import { useArchiveTransaction } from '../../hooks/useTransactions.js'
 import { useTransactionAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
@@ -83,7 +84,17 @@ export default function TransactionTable({
               </div>
               {/* Row 3: due date + notes */}
               <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-2.5 flex-wrap">
-                {t.payment_due_date && <span>Due {formatDate(t.payment_due_date)}</span>}
+                {t.payment_due_date && (
+                  <span className={
+                    getDueDateStatus(t.payment_due_date, t.payment_status) === 'overdue'
+                      ? 'text-red-600 dark:text-red-400 font-semibold'
+                      : getDueDateStatus(t.payment_due_date, t.payment_status) === 'due-soon'
+                      ? 'text-orange-500 dark:text-orange-400'
+                      : ''
+                  }>
+                    Due {formatDate(t.payment_due_date)}
+                  </span>
+                )}
                 {t.payment_due_date && t.notes && <span>·</span>}
                 {t.notes && <span className="truncate max-w-[160px]">{t.notes}</span>}
               </div>
@@ -196,7 +207,13 @@ export default function TransactionTable({
                   )}
                   <td className="px-4 py-3 whitespace-nowrap">{formatDate(t.transaction_date)}</td>
                   <td className="px-4 py-3 text-right font-mono">{formatPeso(t.amount)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                  <td className={`px-4 py-3 whitespace-nowrap ${
+                    getDueDateStatus(t.payment_due_date, t.payment_status) === 'overdue'
+                      ? 'text-red-600 dark:text-red-400 font-semibold'
+                      : getDueDateStatus(t.payment_due_date, t.payment_status) === 'due-soon'
+                      ? 'text-orange-500 dark:text-orange-400'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
                     {formatDate(t.payment_due_date)}
                   </td>
                   <td className="px-4 py-3 text-right font-mono text-green-600 dark:text-green-400">
