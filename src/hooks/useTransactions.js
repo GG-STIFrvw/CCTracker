@@ -2,8 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase.js'
 import { addMoney, getPaymentStatus, getRemainingBalance } from '../utils/money.js'
 
-export function useTransactions(cardId) {
-  return useQuery({
+export function makeTransactionQuery(cardId) {
+  return {
     queryKey: ['transactions', cardId],
     enabled: !!cardId,
     queryFn: async () => {
@@ -17,7 +17,11 @@ export function useTransactions(cardId) {
       if (error) throw error
       return data
     },
-  })
+  }
+}
+
+export function useTransactions(cardId) {
+  return useQuery(makeTransactionQuery(cardId))
 }
 
 export function useAddTransaction() {
