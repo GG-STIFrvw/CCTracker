@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import useAppStore from '../../store/useAppStore.js'
 import Button from '../ui/Button.jsx'
-import { SunIcon, MoonIcon, OwlIcon, ExpensesIcon, HomeIcon, UsersIcon, ShareIcon } from '../ui/icons.jsx'
+import { SunIcon, MoonIcon, OwlIcon, ExpensesIcon, HomeIcon, UsersIcon, ShareIcon, ProfileIcon } from '../ui/icons.jsx'
 import { usePendingInvites } from '../../hooks/useShares.js'
 import { usePendingBorrowerInvites } from '../../hooks/useBorrowerShares.js'
 
@@ -23,6 +23,7 @@ export default function Navbar() {
     { path: '/shared', label: 'Shared', Icon: ShareIcon, badge: pendingInvites.length },
     { path: '/shared-borrowers', label: 'Borrowers', Icon: UsersIcon, badge: pendingBorrowerInvites.length },
     { path: '/expenses', label: 'Expenses', Icon: ExpensesIcon, badge: 0 },
+    { path: '/profile', label: 'Profile', Icon: ProfileIcon, badge: 0 },
   ]
 
   function isActive(path) {
@@ -47,7 +48,7 @@ export default function Navbar() {
 
         {user && (
           <span className="text-gray-500 dark:text-gray-500 text-sm truncate max-w-[200px]">
-            {user.email}
+            {user.user_metadata?.display_name || user.email}
           </span>
         )}
 
