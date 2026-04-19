@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { getRemainingBalance } from '../../utils/money.js'
+import { getDueDateStatus } from '../../utils/dates.js'
 import SpendingBar from './SpendingBar.jsx'
 
 function sumOutstanding(transactions = []) {
@@ -15,6 +16,14 @@ export default function CardTile({ card, onEdit, readOnly = false }) {
   const { data: transactions = [] } = useTransactions(card.id)
   const spent = sumOutstanding(transactions)
 
+  const overdueCount = transactions.filter(
+    (t) => getDueDateStatus(t.payment_due_date, t.payment_status) === 'overdue'
+  ).length
+  const dueSoonCount = transactions.filter(
+    (t) => getDueDateStatus(t.payment_due_date, t.payment_status) === 'due-soon'
+  ).length
+  const alertCount = overdueCount + dueSoonCount
+
   const gradient = `linear-gradient(135deg, ${card.color_primary}, ${card.color_secondary})`
 
   function handleClick() {
@@ -28,6 +37,16 @@ export default function CardTile({ card, onEdit, readOnly = false }) {
       style={{ background: gradient, minHeight: 190 }}
       onClick={handleClick}
     >
+      {alertCount > 0 && (
+        <span
+          className={`absolute top-3 left-3 text-white text-xs font-bold px-2 py-0.5 rounded-full ${
+            overdueCount > 0 ? 'bg-red-500' : 'bg-orange-400'
+          }`}
+        >
+          {alertCount} {overdueCount > 0 ? 'overdue' : 'due soon'}
+        </span>
+      )}
+
       {/* Edit button — hidden in readOnly mode */}
       {!readOnly && (
         <button
