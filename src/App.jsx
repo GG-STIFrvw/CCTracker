@@ -10,6 +10,7 @@ import SharedWithMePage from './pages/SharedWithMePage.jsx'
 import LoanPage from './pages/LoanPage.jsx'
 import SharedBorrowersPage from './pages/SharedBorrowersPage.jsx'
 import ExpensesPage from './pages/ExpensesPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 30 } },
@@ -133,6 +134,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <ExpensesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
