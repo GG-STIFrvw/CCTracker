@@ -25,7 +25,7 @@ export default function SharedBorrowersPage() {
       <main className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            Borrowers shared with me
+            Shared Debt Contacts
           </h2>
           <button
             onClick={() => navigate('/')}
