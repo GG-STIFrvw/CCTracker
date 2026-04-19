@@ -21,15 +21,18 @@ export default function ProfilePage() {
   async function handleSaveName(e) {
     e.preventDefault()
     setSavingName(true)
-    const { data, error } = await supabase.auth.updateUser({
-      data: { display_name: displayName.trim() },
-    })
-    setSavingName(false)
-    if (error) {
-      toast(error.message, 'error')
-    } else {
-      setUser(data.user)
-      toast('Display name updated!', 'success')
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { display_name: displayName.trim() },
+      })
+      if (error) {
+        toast(error.message, 'error')
+      } else {
+        setUser(data.user)
+        toast('Display name updated!', 'success')
+      }
+    } finally {
+      setSavingName(false)
     }
   }
 
@@ -44,14 +47,17 @@ export default function ProfilePage() {
       return
     }
     setSavingPassword(true)
-    const { error } = await supabase.auth.updateUser({ password: newPassword })
-    setSavingPassword(false)
-    if (error) {
-      toast(error.message, 'error')
-    } else {
-      setNewPassword('')
-      setConfirmPassword('')
-      toast('Password updated!', 'success')
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) {
+        toast(error.message, 'error')
+      } else {
+        setNewPassword('')
+        setConfirmPassword('')
+        toast('Password updated!', 'success')
+      }
+    } finally {
+      setSavingPassword(false)
     }
   }
 
