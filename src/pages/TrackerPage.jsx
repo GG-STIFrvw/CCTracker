@@ -148,52 +148,54 @@ export default function TrackerPage() {
             )}
 
             {/* Filter bar */}
-            <div className="flex flex-wrap items-center gap-3 mt-4 mb-2">
-              {/* Status pills */}
-              <div className="flex gap-1">
-                {['all', 'unpaid', 'partial', 'paid'].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setStatusFilter(s)}
-                    aria-pressed={statusFilter === s}
-                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${
-                      statusFilter === s
-                        ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
-                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-                  </button>
-                ))}
-              </div>
+            {!readOnly && (
+              <div className="flex flex-wrap items-center gap-3 mt-4 mb-2">
+                {/* Status pills */}
+                <div className="flex gap-1">
+                  {['all', 'unpaid', 'partial', 'paid'].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setStatusFilter(s)}
+                      aria-pressed={statusFilter === s}
+                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${
+                        statusFilter === s
+                          ? 'bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] font-semibold'
+                          : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+                    </button>
+                  ))}
+                </div>
 
-              {/* Date range */}
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                <input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                  className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
-                  aria-label="From date"
-                />
-                <span aria-hidden="true">—</span>
-                <input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
-                  aria-label="To date"
-                />
-                {(dateFrom || dateTo || statusFilter !== 'all') && (
-                  <button
-                    onClick={() => { setDateFrom(''); setDateTo(''); setStatusFilter('all') }}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
-                  >
-                    Clear
-                  </button>
-                )}
+                {/* Date range */}
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
+                    aria-label="From date"
+                  />
+                  <span aria-hidden="true">—</span>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-xs text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-[#9FE870]"
+                    aria-label="To date"
+                  />
+                  {(dateFrom || dateTo || statusFilter !== 'all') && (
+                    <button
+                      onClick={() => { setDateFrom(''); setDateTo(''); setStatusFilter('all') }}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xs"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Action bar */}
             {!readOnly && transactions.length > 0 && (

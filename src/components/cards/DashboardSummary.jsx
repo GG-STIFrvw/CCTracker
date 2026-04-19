@@ -7,6 +7,8 @@ export default function DashboardSummary({ cards }) {
 
   const isLoading = results.some((r) => r.isLoading)
 
+  if (cards.length === 0) return null
+
   const allTransactions = results.flatMap((r) => r.data ?? [])
   const totalOutstanding = allTransactions.reduce(
     (sum, t) => sum + getRemainingBalance(t.amount, t.amount_paid),

@@ -75,7 +75,11 @@ export default function ProfilePage() {
         <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-4">
           <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4">Display Name</h2>
           <form onSubmit={handleSaveName} className="flex flex-col gap-3">
+            <label className="text-xs text-gray-500 dark:text-gray-400" htmlFor="display-name">
+              Display Name
+            </label>
             <input
+              id="display-name"
               className={inputClass}
               placeholder="Your name"
               value={displayName}
