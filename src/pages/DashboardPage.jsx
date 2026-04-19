@@ -16,6 +16,7 @@ import { useExpenses } from '../hooks/useExpenses.js'
 import { filterByMonth } from '../utils/expenses.js'
 import { addMoney, formatPeso } from '../utils/money.js'
 import ExpenseForm from '../components/expenses/ExpenseForm.jsx'
+import DashboardSummary from '../components/cards/DashboardSummary.jsx'
 
 export default function DashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -81,6 +82,10 @@ export default function DashboardPage() {
             </p>
             <Button onClick={() => setShowAdd(true)}>+ Add Your First Card</Button>
           </div>
+        )}
+
+        {!isLoading && !error && ownCards.length > 0 && (
+          <DashboardSummary cards={ownCards} />
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
