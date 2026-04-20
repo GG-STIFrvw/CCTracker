@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { formatPeso, getRemainingBalance } from '../../utils/money.js'
 import { getDueDateStatus } from '../../utils/dates.js'
 import { useArchiveTransaction, useRestoreTransaction } from '../../hooks/useTransactions.js'
@@ -34,13 +34,22 @@ export default function TransactionTable({
   const [confirmRestoreId, setConfirmRestoreId] = useState(null)
   const [attachingTxId, setAttachingTxId] = useState(null)
 
+  useEffect(() => {
+    setConfirmArchiveId(null)
+    setConfirmRestoreId(null)
+  }, [mode])
+
   const txIds = useMemo(() => transactions.map((t) => t.id), [transactions])
   const { data: attCounts = {} } = useTransactionAttachmentCounts(txIds)
 
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-16 text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
-        {readOnly ? 'No transactions.' : 'No transactions yet. Add your first one above.'}
+        {readOnly
+          ? 'No transactions.'
+          : mode === 'archived'
+          ? 'No archived transactions.'
+          : 'No transactions yet. Add your first one above.'}
       </div>
     )
   }
