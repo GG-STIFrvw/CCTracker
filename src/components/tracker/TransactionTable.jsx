@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { formatPeso, getRemainingBalance } from '../../utils/money.js'
 import { getDueDateStatus } from '../../utils/dates.js'
-import { useArchiveTransaction } from '../../hooks/useTransactions.js'
+import { useArchiveTransaction, useRestoreTransaction } from '../../hooks/useTransactions.js'
 import { useTransactionAttachmentCounts } from '../../hooks/useAttachments.js'
 import AttachmentModal from '../ui/AttachmentModal.jsx'
 import Badge from '../ui/Badge.jsx'
@@ -26,9 +26,12 @@ export default function TransactionTable({
   selectedIds = new Set(),
   onToggleSelect,
   onEdit,
+  mode = 'active',
 }) {
   const archive = useArchiveTransaction()
+  const restore = useRestoreTransaction()
   const [confirmArchiveId, setConfirmArchiveId] = useState(null)
+  const [confirmRestoreId, setConfirmRestoreId] = useState(null)
   const [attachingTxId, setAttachingTxId] = useState(null)
 
   const txIds = useMemo(() => transactions.map((t) => t.id), [transactions])
@@ -112,13 +115,15 @@ export default function TransactionTable({
                       <span>{count}</span>
                     </button>
                   )}
-                  <button
-                    onClick={() => onEdit?.(t)}
-                    className="text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"
-                  >
-                    <EditIcon className="w-3 h-3" /> Edit
-                  </button>
-                  {t.payment_status !== 'paid' && (
+                  {mode !== 'archived' && (
+                    <button
+                      onClick={() => onEdit?.(t)}
+                      className="text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-2.5 py-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-1"
+                    >
+                      <EditIcon className="w-3 h-3" /> Edit
+                    </button>
+                  )}
+                  {mode !== 'archived' && t.payment_status !== 'paid' && (
                     <button
                       onClick={() => onPay(t)}
                       className="text-xs text-[#2D6A4F] dark:text-[#9FE870] border border-[#2D6A4F]/30 dark:border-[#9FE870]/30 px-2.5 py-1 rounded-lg hover:bg-[#9FE870]/10 transition-colors"
@@ -127,24 +132,46 @@ export default function TransactionTable({
                     </button>
                   )}
                   <div className="ml-auto">
-                    {confirmArchiveId === t.id ? (
-                      <span className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">Archive?</span>
+                    {mode === 'archived' ? (
+                      confirmRestoreId === t.id ? (
+                        <span className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">Restore?</span>
+                          <button
+                            onClick={() => { restore.mutate({ id: t.id, cardId }); setConfirmRestoreId(null) }}
+                            className="text-xs text-[#2D6A4F] dark:text-[#9FE870] font-medium"
+                            disabled={restore.isPending}
+                            aria-label="Confirm restore"
+                          >Yes</button>
+                          <span className="text-gray-300 dark:text-gray-600">/</span>
+                          <button onClick={() => setConfirmRestoreId(null)} className="text-xs text-gray-400" aria-label="Cancel restore">No</button>
+                        </span>
+                      ) : (
                         <button
-                          onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
-                          className="text-xs text-red-500 font-medium"
-                          disabled={archive.isPending}
-                          aria-label="Confirm archive"
-                        >Yes</button>
-                        <span className="text-gray-300 dark:text-gray-600">/</span>
-                        <button onClick={() => setConfirmArchiveId(null)} className="text-xs text-gray-400" aria-label="Cancel archive">No</button>
-                      </span>
+                          onClick={() => setConfirmRestoreId(t.id)}
+                          className="text-xs text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
+                          disabled={restore.isPending}
+                        >Restore</button>
+                      )
                     ) : (
-                      <button
-                        onClick={() => setConfirmArchiveId(t.id)}
-                        className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-                        disabled={archive.isPending}
-                      >Archive</button>
+                      confirmArchiveId === t.id ? (
+                        <span className="flex items-center gap-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">Archive?</span>
+                          <button
+                            onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
+                            className="text-xs text-red-500 font-medium"
+                            disabled={archive.isPending}
+                            aria-label="Confirm archive"
+                          >Yes</button>
+                          <span className="text-gray-300 dark:text-gray-600">/</span>
+                          <button onClick={() => setConfirmArchiveId(null)} className="text-xs text-gray-400" aria-label="Cancel archive">No</button>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmArchiveId(t.id)}
+                          className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                          disabled={archive.isPending}
+                        >Archive</button>
+                      )
                     )}
                   </div>
                 </div>
@@ -182,7 +209,7 @@ export default function TransactionTable({
               <th className="px-4 py-3 text-right whitespace-nowrap">Remaining</th>
               <th className="px-4 py-3 text-center whitespace-nowrap">Status</th>
               <th className="px-4 py-3 text-left">Notes</th>
-              <th className="px-4 py-3 text-center whitespace-nowrap">Files</th>
+              <th className="px-4 py-3 text-center whitespace-nowrap">Invoice</th>
               {!readOnly && (
                 <th className="px-4 py-3 text-center whitespace-nowrap">Actions</th>
               )}
@@ -248,55 +275,89 @@ export default function TransactionTable({
                   </td>
                   {!readOnly && (
                     <td className="px-4 py-3 text-center">
-                      <div className="flex gap-2 justify-center items-center">
-                        <button
-                          onClick={() => onEdit?.(t)}
-                          className="text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
-                          title="Edit transaction"
-                          aria-label="Edit transaction"
-                        >
-                          <EditIcon className="w-3.5 h-3.5" />
-                        </button>
-                        {t.payment_status !== 'paid' && (
-                          <Button
-                            variant="ghost"
-                            className="text-xs py-1 px-2"
-                            onClick={() => onPay(t)}
-                          >
-                            Pay
-                          </Button>
-                        )}
-                        {confirmArchiveId === t.id ? (
-                          <span className="flex items-center gap-1">
-                            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Archive?</span>
+                      {mode === 'archived' ? (
+                        <div className="flex gap-2 justify-center items-center">
+                          {confirmRestoreId === t.id ? (
+                            <span className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Restore?</span>
+                              <button
+                                onClick={() => { restore.mutate({ id: t.id, cardId }); setConfirmRestoreId(null) }}
+                                className="text-xs text-[#2D6A4F] dark:text-[#9FE870] font-medium transition-colors"
+                                disabled={restore.isPending}
+                                aria-label="Confirm restore"
+                              >
+                                Yes
+                              </button>
+                              <span className="text-gray-300 dark:text-gray-600">/</span>
+                              <button
+                                onClick={() => setConfirmRestoreId(null)}
+                                className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                aria-label="Cancel restore"
+                              >
+                                No
+                              </button>
+                            </span>
+                          ) : (
                             <button
-                              onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
-                              className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
-                              disabled={archive.isPending}
-                              aria-label="Confirm archive"
+                              onClick={() => setConfirmRestoreId(t.id)}
+                              className="text-xs text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
+                              disabled={restore.isPending}
                             >
-                              Yes
+                              Restore
                             </button>
-                            <span className="text-gray-300 dark:text-gray-600">/</span>
-                            <button
-                              onClick={() => setConfirmArchiveId(null)}
-                              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                              aria-label="Cancel archive"
-                            >
-                              No
-                            </button>
-                          </span>
-                        ) : (
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 justify-center items-center">
                           <button
-                            onClick={() => setConfirmArchiveId(t.id)}
-                            className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
-                            title="Archive transaction"
-                            disabled={archive.isPending}
+                            onClick={() => onEdit?.(t)}
+                            className="text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors"
+                            title="Edit transaction"
+                            aria-label="Edit transaction"
                           >
-                            Archive
+                            <EditIcon className="w-3.5 h-3.5" />
                           </button>
-                        )}
-                      </div>
+                          {t.payment_status !== 'paid' && (
+                            <Button
+                              variant="ghost"
+                              className="text-xs py-1 px-2"
+                              onClick={() => onPay(t)}
+                            >
+                              Pay
+                            </Button>
+                          )}
+                          {confirmArchiveId === t.id ? (
+                            <span className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Archive?</span>
+                              <button
+                                onClick={() => { archive.mutate({ id: t.id, cardId }); setConfirmArchiveId(null) }}
+                                className="text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
+                                disabled={archive.isPending}
+                                aria-label="Confirm archive"
+                              >
+                                Yes
+                              </button>
+                              <span className="text-gray-300 dark:text-gray-600">/</span>
+                              <button
+                                onClick={() => setConfirmArchiveId(null)}
+                                className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                                aria-label="Cancel archive"
+                              >
+                                No
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmArchiveId(t.id)}
+                              className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 text-xs transition-colors"
+                              title="Archive transaction"
+                              disabled={archive.isPending}
+                            >
+                              Archive
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </td>
                   )}
                 </tr>
