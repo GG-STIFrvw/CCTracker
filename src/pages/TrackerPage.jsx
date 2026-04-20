@@ -39,7 +39,7 @@ export default function TrackerPage() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [showBulkConfirm, setShowBulkConfirm] = useState(false)
-  const { data: archivedTransactions = [], isLoading: isLoadingArchived } = useArchivedTransactions(cardId)
+  const { data: archivedTransactions = [], isLoading: isLoadingArchived } = useArchivedTransactions(readOnly ? null : cardId)
 
   const card = cards.find((c) => c.id === cardId)
 
@@ -79,7 +79,6 @@ export default function TrackerPage() {
     try {
       await payBulk.mutateAsync({ cardId, transactions: selectedTransactions })
       toast(`${selectedTransactions.length} transaction${selectedTransactions.length !== 1 ? 's' : ''} marked as paid`, 'success')
-      setShowBulkConfirm(false)
       exitBulkPay()
     } catch {
       toast('Payment failed. Please try again.', 'error')

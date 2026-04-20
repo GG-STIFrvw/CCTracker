@@ -61,8 +61,10 @@ export function useArchiveTransaction() {
       if (error) throw error
       return { cardId }
     },
-    onSuccess: (_data, { cardId }) =>
-      qc.invalidateQueries({ queryKey: ['transactions', cardId] }),
+    onSuccess: (_data, { cardId }) => {
+      qc.invalidateQueries({ queryKey: ['transactions', cardId] })
+      qc.invalidateQueries({ queryKey: ['transactions_archived', cardId] })
+    },
   })
 }
 
