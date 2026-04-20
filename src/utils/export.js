@@ -1,4 +1,4 @@
-import { getRemainingBalance } from './money.js'
+import { getRemainingBalance, addMoney } from './money.js'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -7,9 +7,9 @@ export const CSV_HEADERS = ['Date', 'Amount (PHP)', 'Due Date', 'Paid (PHP)', 'R
 function calcTotals(transactions) {
   return transactions.reduce(
     (acc, t) => {
-      acc.amount += Number(t.amount) || 0
-      acc.paid += Number(t.amount_paid ?? 0)
-      acc.remaining += getRemainingBalance(t.amount, t.amount_paid ?? 0)
+      acc.amount = addMoney(acc.amount, Number(t.amount) || 0)
+      acc.paid = addMoney(acc.paid, Number(t.amount_paid ?? 0))
+      acc.remaining = addMoney(acc.remaining, getRemainingBalance(t.amount, t.amount_paid ?? 0))
       return acc
     },
     { amount: 0, paid: 0, remaining: 0 }
