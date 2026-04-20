@@ -66,6 +66,41 @@ export function useArchiveTransaction() {
   })
 }
 
+export function useArchivedTransactions(cardId) {
+  return useQuery({
+    queryKey: ['transactions_archived', cardId],
+    enabled: !!cardId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('card_id', cardId)
+        .eq('is_archived', true)
+        .order('transaction_date', { ascending: false })
+      if (error) throw error
+      return data
+    },
+  })
+}
+
+export function useRestoreTransaction() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, cardId }) => {
+      const { error } = await supabase
+        .from('transactions')
+        .update({ is_archived: false })
+        .eq('id', id)
+      if (error) throw error
+      return { cardId }
+    },
+    onSuccess: (_data, { cardId }) => {
+      qc.invalidateQueries({ queryKey: ['transactions', cardId] })
+      qc.invalidateQueries({ queryKey: ['transactions_archived', cardId] })
+    },
+  })
+}
+
 export function useRecordPayment() {
   const qc = useQueryClient()
   return useMutation({
