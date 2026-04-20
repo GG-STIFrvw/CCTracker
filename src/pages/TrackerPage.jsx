@@ -71,6 +71,7 @@ export default function TrackerPage() {
   function exitBulkPay() {
     setBulkPayMode(false)
     setSelectedTransactions([])
+    setShowBulkConfirm(false)
   }
 
   async function handlePaySelected() {
