@@ -32,10 +32,10 @@ describe('buildCSVContent', () => {
     expect(firstLine).toContain('Notes')
   })
 
-  it('produces correct number of rows (header + data)', () => {
+  it('produces correct number of rows (header + data + blank + totals)', () => {
     const csv = buildCSVContent(sampleTransactions)
     const lines = csv.split('\n')
-    expect(lines).toHaveLength(3) // 1 header + 2 data rows
+    expect(lines).toHaveLength(5) // 1 header + 2 data + 1 blank + 1 totals
   })
 
   it('includes transaction date and amount in data rows', () => {
@@ -60,5 +60,37 @@ describe('buildCSVContent', () => {
     const csv = buildCSVContent([sampleTransactions[1]])
     expect(csv).not.toContain('undefined')
     expect(csv).not.toContain('null')
+  })
+})
+
+describe('buildCSVContent totals row', () => {
+  it('includes a TOTALS row after the data', () => {
+    const csv = buildCSVContent(sampleTransactions)
+    expect(csv).toContain('TOTALS')
+  })
+
+  it('produces correct number of rows (header + data + blank + totals)', () => {
+    const csv = buildCSVContent(sampleTransactions)
+    const lines = csv.split('\n')
+    // 1 header + 2 data + 1 blank + 1 totals = 5
+    expect(lines).toHaveLength(5)
+  })
+
+  it('totals row contains correct summed amount', () => {
+    const csv = buildCSVContent(sampleTransactions)
+    // total amount: 1500 + 2000 = 3500
+    expect(csv).toContain('3500')
+  })
+
+  it('totals row contains correct summed paid', () => {
+    const csv = buildCSVContent(sampleTransactions)
+    // total paid: 500 + 2000 = 2500
+    expect(csv).toContain('2500')
+  })
+
+  it('totals row contains correct summed remaining', () => {
+    const csv = buildCSVContent(sampleTransactions)
+    // remaining: (1500-500) + (2000-2000) = 1000
+    expect(csv).toContain('1000')
   })
 })

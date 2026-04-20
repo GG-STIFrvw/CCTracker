@@ -4,7 +4,20 @@ import autoTable from 'jspdf-autotable'
 
 export const CSV_HEADERS = ['Date', 'Amount (PHP)', 'Due Date', 'Paid (PHP)', 'Remaining (PHP)', 'Status', 'Notes']
 
+function calcTotals(transactions) {
+  return transactions.reduce(
+    (acc, t) => {
+      acc.amount += Number(t.amount) || 0
+      acc.paid += Number(t.amount_paid ?? 0)
+      acc.remaining += getRemainingBalance(t.amount, t.amount_paid ?? 0)
+      return acc
+    },
+    { amount: 0, paid: 0, remaining: 0 }
+  )
+}
+
 export function buildCSVContent(transactions) {
+  const { amount, paid, remaining } = calcTotals(transactions)
   const rows = transactions.map(t => [
     t.transaction_date || '',
     t.amount,
@@ -14,7 +27,9 @@ export function buildCSVContent(transactions) {
     t.payment_status,
     t.notes || '',
   ])
-  return [CSV_HEADERS, ...rows]
+  const totalsRow = ['TOTALS', amount, '', paid, remaining, '', '']
+  const blankRow = ['', '', '', '', '', '', '']
+  return [CSV_HEADERS, ...rows, blankRow, totalsRow]
     .map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
     .join('\n')
 }
@@ -33,6 +48,7 @@ export function exportCSV(transactions, filename) {
 }
 
 export function exportPDF(transactions, filename, title = 'Transactions') {
+  const { amount, paid, remaining } = calcTotals(transactions)
   const doc = new jsPDF()
   doc.setFontSize(14)
   doc.text(title, 14, 16)
@@ -52,8 +68,10 @@ export function exportPDF(transactions, filename, title = 'Transactions') {
       t.payment_status,
       t.notes || '—',
     ]),
+    foot: [['TOTALS', `PHP ${amount.toFixed(2)}`, '', `PHP ${paid.toFixed(2)}`, `PHP ${remaining.toFixed(2)}`, '', '']],
     styles: { fontSize: 8 },
     headStyles: { fillColor: [45, 106, 79] },
+    footStyles: { fillColor: [45, 106, 79], textColor: 255, fontStyle: 'bold' },
   })
 
   doc.save(`${filename}.pdf`)
