@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCards } from '../hooks/useCards.js'
-import { useTransactions, usePayBulk } from '../hooks/useTransactions.js'
+import { useTransactions, usePayBulk, useArchivedTransactions } from '../hooks/useTransactions.js'
 import { getRemainingBalance } from '../utils/money.js'
 import Navbar from '../components/layout/Navbar.jsx'
 import TrackerSummary from '../components/tracker/TrackerSummary.jsx'
@@ -12,6 +12,7 @@ import PaymentModal from '../components/tracker/PaymentModal.jsx'
 import BulkPayBar from '../components/tracker/BulkPayBar.jsx'
 import ExportButtons from '../components/tracker/ExportButtons.jsx'
 import CloseCycleModal from '../components/tracker/CloseCycleModal.jsx'
+import BulkPayConfirmModal from '../components/tracker/BulkPayConfirmModal.jsx'
 import CycleHistoryList from '../components/tracker/CycleHistoryList.jsx'
 import { useToast, ToastContainer } from '../components/ui/Toast.jsx'
 import Button from '../components/ui/Button.jsx'
@@ -37,6 +38,8 @@ export default function TrackerPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false)
+  const { data: archivedTransactions = [], isLoading: isLoadingArchived } = useArchivedTransactions(cardId)
 
   const card = cards.find((c) => c.id === cardId)
 
@@ -75,6 +78,7 @@ export default function TrackerPage() {
     try {
       await payBulk.mutateAsync({ cardId, transactions: selectedTransactions })
       toast(`${selectedTransactions.length} transaction${selectedTransactions.length !== 1 ? 's' : ''} marked as paid`, 'success')
+      setShowBulkConfirm(false)
       exitBulkPay()
     } catch {
       toast('Payment failed. Please try again.', 'error')
@@ -114,7 +118,7 @@ export default function TrackerPage() {
         {/* Tabs + Back button on same row */}
         <div className="flex items-end justify-between border-b border-gray-200 dark:border-gray-700 mb-6">
           <div className="flex gap-1">
-          {['active', 'history'].map(tab => (
+          {(readOnly ? ['active', 'history'] : ['active', 'history', 'archive']).map(tab => (
             <button
               key={tab}
               onClick={() => { setActiveTab(tab); exitBulkPay(); setStatusFilter('all'); setDateFrom(''); setDateTo('') }}
@@ -221,7 +225,7 @@ export default function TrackerPage() {
                 <BulkPayBar
                   selectedCount={selectedTransactions.length}
                   selectedTotal={selectedTotal}
-                  onPaySelected={handlePaySelected}
+                  onPaySelected={() => setShowBulkConfirm(true)}
                   onCancel={exitBulkPay}
                   isPending={payBulk.isPending}
                 />
@@ -260,6 +264,23 @@ export default function TrackerPage() {
         {activeTab === 'history' && (
           <CycleHistoryList cardId={cardId} cardName={card.nickname} />
         )}
+
+        {activeTab === 'archive' && (
+          <>
+            {isLoadingArchived ? (
+              <p className="text-gray-500 text-center py-10 mt-6">Loading archived transactions…</p>
+            ) : (
+              <TransactionTable
+                transactions={archivedTransactions}
+                cardId={cardId}
+                onPay={() => {}}
+                onEdit={() => {}}
+                readOnly={false}
+                mode="archived"
+              />
+            )}
+          </>
+        )}
       </main>
 
       {/* Modals */}
@@ -293,6 +314,16 @@ export default function TrackerPage() {
             toast('Billing cycle closed!', 'success')
             setActiveTab('history')
           }}
+        />
+      )}
+
+      {!readOnly && showBulkConfirm && (
+        <BulkPayConfirmModal
+          count={selectedTransactions.length}
+          total={selectedTotal}
+          onConfirm={handlePaySelected}
+          onCancel={() => setShowBulkConfirm(false)}
+          isPending={payBulk.isPending}
         />
       )}
 
