@@ -13,7 +13,7 @@ export default function ExpenseSummary({ total, paymentTotals, monthLabel, onBac
           {onBack && (
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <ReturnIcon className="w-3.5 h-3.5" />
               Back to Dashboard
