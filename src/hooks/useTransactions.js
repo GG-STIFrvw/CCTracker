@@ -112,12 +112,16 @@ export function useRecordPayment() {
       } = await supabase.auth.getUser()
 
       // 1. Insert payment history record
-      const { error: payErr } = await supabase.from('payments').insert({
-        transaction_id: transaction.id,
-        user_id: user.id,
-        amount: paymentAmount,
-        notes,
-      })
+      const { data: payData, error: payErr } = await supabase
+        .from('payments')
+        .insert({
+          transaction_id: transaction.id,
+          user_id: user.id,
+          amount: paymentAmount,
+          notes,
+        })
+        .select()
+        .single()
       if (payErr) throw payErr
 
       // 2. Update transaction totals using cents-based math
@@ -129,7 +133,7 @@ export function useRecordPayment() {
         .eq('id', transaction.id)
       if (txErr) throw txErr
 
-      return { cardId: transaction.card_id }
+      return { cardId: transaction.card_id, paymentId: payData.id }
     },
     onSuccess: (_data, { transaction }) =>
       qc.invalidateQueries({ queryKey: ['transactions', transaction.card_id] }),
