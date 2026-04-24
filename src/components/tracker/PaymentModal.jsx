@@ -168,8 +168,11 @@ export default function PaymentModal({ transaction, onClose, onSuccess }) {
             Receipts (optional)
           </label>
           <div
+            role="button"
+            tabIndex={0}
             className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-3 text-center cursor-pointer hover:border-[#9FE870] dark:hover:border-[#9FE870] transition-colors"
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
           >
             <span className="text-gray-500 dark:text-gray-400 text-sm">📎 Attach receipt</span>
             <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
