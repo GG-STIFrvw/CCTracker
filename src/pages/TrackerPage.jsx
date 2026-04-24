@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useCards } from '../hooks/useCards.js'
 import { useTransactions, usePayBulk, useArchivedTransactions } from '../hooks/useTransactions.js'
+import { useUploadAttachment } from '../hooks/useAttachments.js'
 import { getRemainingBalance } from '../utils/money.js'
 import Navbar from '../components/layout/Navbar.jsx'
 import TrackerSummary from '../components/tracker/TrackerSummary.jsx'
@@ -27,6 +28,7 @@ export default function TrackerPage() {
   const { data: cards = [] } = useCards()
   const { data: transactions = [], isLoading } = useTransactions(cardId)
   const payBulk = usePayBulk()
+  const uploadAttachment = useUploadAttachment()
   const { toasts, toast } = useToast()
 
   const [activeTab, setActiveTab] = useState('active')
@@ -74,14 +76,33 @@ export default function TrackerPage() {
     setShowBulkConfirm(false)
   }
 
-  async function handlePaySelected() {
+  async function handlePaySelected(stagedFiles = []) {
     if (selectedTransactions.length === 0) return
+    let paymentIds
     try {
-      await payBulk.mutateAsync({ cardId, transactions: selectedTransactions })
+      const result = await payBulk.mutateAsync({ cardId, transactions: selectedTransactions })
+      paymentIds = result.paymentIds
       toast(`${selectedTransactions.length} transaction${selectedTransactions.length !== 1 ? 's' : ''} marked as paid`, 'success')
       exitBulkPay()
     } catch {
       toast('Payment failed. Please try again.', 'error')
+      return
+    }
+
+    if (stagedFiles.length > 0 && paymentIds?.length > 0) {
+      const failed = []
+      for (const paymentId of paymentIds) {
+        for (const file of stagedFiles) {
+          try {
+            await uploadAttachment.mutateAsync({ file, entityType: 'payment', entityId: paymentId })
+          } catch {
+            failed.push(file.name)
+          }
+        }
+      }
+      if (failed.length > 0) {
+        toast(`Payments saved. Some receipts failed to upload: ${[...new Set(failed)].join(', ')}`, 'error')
+      }
     }
   }
 
@@ -323,7 +344,7 @@ export default function TrackerPage() {
           total={selectedTotal}
           onConfirm={handlePaySelected}
           onCancel={() => setShowBulkConfirm(false)}
-          isPending={payBulk.isPending}
+          isPending={payBulk.isPending || uploadAttachment.isPending}
         />
       )}
 

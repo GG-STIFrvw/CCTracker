@@ -188,19 +188,23 @@ export function usePayBulk() {
         data: { user },
       } = await supabase.auth.getUser()
 
-      await Promise.all(
+      const paymentRows = await Promise.all(
         transactions.map(async (t) => {
           const remaining = getRemainingBalance(t.amount, t.amount_paid)
-          if (remaining <= 0) return
+          if (remaining <= 0) return null
 
           const newAmountPaid = addMoney(t.amount_paid, remaining)
 
-          const { error: payErr } = await supabase.from('payments').insert({
-            transaction_id: t.id,
-            user_id: user.id,
-            amount: remaining,
-            notes: 'Bulk payment',
-          })
+          const { data: payData, error: payErr } = await supabase
+            .from('payments')
+            .insert({
+              transaction_id: t.id,
+              user_id: user.id,
+              amount: remaining,
+              notes: 'Bulk payment',
+            })
+            .select()
+            .single()
           if (payErr) throw payErr
 
           const { error: txErr } = await supabase
@@ -208,10 +212,12 @@ export function usePayBulk() {
             .update({ amount_paid: newAmountPaid, payment_status: 'paid' })
             .eq('id', t.id)
           if (txErr) throw txErr
+
+          return payData.id
         })
       )
 
-      return { cardId }
+      return { cardId, paymentIds: paymentRows.filter(Boolean) }
     },
     onSuccess: (_data, { cardId }) =>
       qc.invalidateQueries({ queryKey: ['transactions', cardId] }),
