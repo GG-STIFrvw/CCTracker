@@ -4,6 +4,8 @@ import Button from './Button.jsx'
 import {
   useTransactionAttachments,
   useLoanAttachments,
+  usePaymentAttachments,
+  useLoanPaymentAttachments,
   useUploadAttachment,
   useDeleteAttachment,
   MAX_FILES,
@@ -14,13 +16,17 @@ export default function AttachmentModal({ entityType, entityId, borrowerId, read
   const [uploadError, setUploadError] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
-  if (process.env.NODE_ENV !== 'production' && entityType !== 'transaction' && entityType !== 'loan') {
+  if (process.env.NODE_ENV !== 'production' &&
+      !['transaction', 'loan', 'payment', 'loan_payment'].includes(entityType)) {
     console.error(`AttachmentModal: unknown entityType "${entityType}"`)
   }
 
   const txQuery = useTransactionAttachments(entityType === 'transaction' ? entityId : null)
   const loanQuery = useLoanAttachments(entityType === 'loan' ? entityId : null)
-  const query = entityType === 'transaction' ? txQuery : loanQuery
+  const paymentQuery = usePaymentAttachments(entityType === 'payment' ? entityId : null)
+  const loanPaymentQuery = useLoanPaymentAttachments(entityType === 'loan_payment' ? entityId : null)
+  const queryMap = { transaction: txQuery, loan: loanQuery, payment: paymentQuery, loan_payment: loanPaymentQuery }
+  const query = queryMap[entityType] ?? txQuery
   const attachments = query.data ?? []
 
   const upload = useUploadAttachment()
