@@ -49,12 +49,16 @@ export function useRecordLoanPayment() {
       } = await supabase.auth.getUser()
 
       // 1. Insert payment record
-      const { error: payErr } = await supabase.from('loan_payments').insert({
-        loan_id: loan.id,
-        user_id: user.id,
-        amount: paymentAmount,
-        notes,
-      })
+      const { data: payData, error: payErr } = await supabase
+        .from('loan_payments')
+        .insert({
+          loan_id: loan.id,
+          user_id: user.id,
+          amount: paymentAmount,
+          notes,
+        })
+        .select()
+        .single()
       if (payErr) throw payErr
 
       // 2. Compute new remaining balance
@@ -77,7 +81,7 @@ export function useRecordLoanPayment() {
         .eq('id', loan.id)
       if (loanErr) throw loanErr
 
-      return { borrowerId: loan.borrower_id }
+      return { borrowerId: loan.borrower_id, loanPaymentId: payData.id }
     },
     onSuccess: (_data, { loan }) =>
       qc.invalidateQueries({ queryKey: ['loans', loan.borrower_id] }),
