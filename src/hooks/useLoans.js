@@ -194,6 +194,7 @@ export function useRecordLoanPayment() {
         updates.next_payment_date = null
       } else {
         const nextDate = getNextPeriodDate(loan)
+        // Skip update if date unchanged (e.g. one-time loans return same date before completion)
         if (nextDate && nextDate !== loan.next_payment_date) {
           updates.next_payment_date = nextDate
         }
@@ -268,6 +269,8 @@ export function useWaivePenalty() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ loan, amount, notes }) => {
+      if (amount <= 0) throw new Error('Waiver amount must be greater than zero')
+
       const {
         data: { user },
       } = await supabase.auth.getUser()
