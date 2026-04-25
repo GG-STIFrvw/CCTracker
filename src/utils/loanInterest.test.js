@@ -55,8 +55,8 @@ describe('computeInterestCharge', () => {
   })
 
   it('rounds to nearest cent', () => {
-    // 4% of 79001 = 3160.04 → rounds to 3160.04 (exact cents)
-    expect(computeInterestCharge(79001, 79001, 4, 'simple')).toBeCloseTo(3160.04, 2)
+    // 1.5% of 1 = 0.015 → rounds to 0.02 (half-up)
+    expect(computeInterestCharge(1, 1, 1.5, 'simple')).toBe(0.02)
   })
 })
 
@@ -140,6 +140,7 @@ describe('allocatePayment', () => {
     const small = { principalBalance: 100, interestBalance: 0, penaltyBalance: 0, total: 100 }
     const alloc = allocatePayment(99999, small)
     expect(alloc.principalApplied).toBe(100)
+    expect(alloc.remainder).toBe(99899)
   })
 
   it('no-penalty no-interest: all goes to principal', () => {
@@ -299,7 +300,7 @@ describe('generateMissingEntries', () => {
     // interest_charge = 3160 → outstanding after = 82160
     // late_fee = 82160 * 1% = 821.60
     const lateFee = entries.find(e => e.entry_type === 'late_fee')
-    expect(lateFee.amount).toBeCloseTo(821.6, 2)
+    expect(lateFee.amount).toBe(821.6)
   })
 })
 

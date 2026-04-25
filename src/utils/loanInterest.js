@@ -32,9 +32,9 @@ export function computeOutstanding(loanAmount, ledgerEntries) {
         penaltyChargedCents += toCents(e.amount)
         break
       case 'payment':
-        principalPaidCents += toCents(e.principal_applied)
-        interestPaidCents  += toCents(e.interest_applied)
-        penaltyPaidCents   += toCents(e.penalty_applied)
+        principalPaidCents += toCents(e.principal_applied ?? 0)
+        interestPaidCents  += toCents(e.interest_applied  ?? 0)
+        penaltyPaidCents   += toCents(e.penalty_applied   ?? 0)
         break
       case 'penalty_waiver':
         penaltyWaivedCents += toCents(e.amount)
@@ -62,9 +62,10 @@ export function allocatePayment(paymentAmount, outstanding) {
   const principalAppliedCents = Math.min(remainderCents, toCents(outstanding.principalBalance))
 
   return {
-    penaltyApplied:  fromCents(penaltyAppliedCents),
-    interestApplied: fromCents(interestAppliedCents),
+    penaltyApplied:   fromCents(penaltyAppliedCents),
+    interestApplied:  fromCents(interestAppliedCents),
     principalApplied: fromCents(principalAppliedCents),
+    remainder:        fromCents(Math.max(0, toCents(paymentAmount) - penaltyAppliedCents - interestAppliedCents - principalAppliedCents)),
   }
 }
 
@@ -99,8 +100,6 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
   const result = []
   const workingLedger = [...ledgerEntries]
   let currentDueDate = loan.next_payment_date
-  const isOneTime = loan.payment_frequency === 'one-time'
-  const oneTimeDayOfMonth = isOneTime ? Number(loan.next_payment_date.split('-')[2]) : null
 
   while (currentDueDate <= today) {
     if (!chargedPeriods.has(currentDueDate)) {
@@ -133,11 +132,13 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
         if (!paid) {
           const outstandingAfter = computeOutstanding(loan.amount, workingLedger)
           const totalCents = toCents(outstandingAfter.total)
+          const lateFeeRate = Number(rate.late_fee_rate ?? 0)
+          const penaltyRate = Number(rate.penalty_rate ?? 0)
 
           const lateFeeEntry = {
             loan_id: loan.id,
             entry_type: 'late_fee',
-            amount: fromCents(Math.round(totalCents * Number(rate.late_fee_rate) / 100)),
+            amount: fromCents(Math.round(totalCents * lateFeeRate / 100)),
             principal_applied: 0,
             interest_applied: 0,
             penalty_applied: 0,
@@ -148,7 +149,7 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
           const penaltyEntry = {
             loan_id: loan.id,
             entry_type: 'penalty_interest',
-            amount: fromCents(Math.round(totalCents * Number(rate.penalty_rate) / 100)),
+            amount: fromCents(Math.round(totalCents * penaltyRate / 100)),
             principal_applied: 0,
             interest_applied: 0,
             penalty_applied: 0,
@@ -163,9 +164,11 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
     }
 
     // Advance to next period
-    const next = isOneTime
-      ? advanceNextPaymentDate({ payment_frequency: 'monthly', next_payment_date: currentDueDate, payment_day: oneTimeDayOfMonth })
-      : advanceNextPaymentDate({ payment_frequency: loan.payment_frequency, next_payment_date: currentDueDate, payment_day: loan.payment_day })
+    const next = getNextPeriodDate({
+      payment_frequency: loan.payment_frequency,
+      next_payment_date: currentDueDate,
+      payment_day: loan.payment_day,
+    })
 
     if (!next || next === currentDueDate) break
     currentDueDate = next
