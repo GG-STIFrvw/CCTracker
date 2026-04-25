@@ -87,6 +87,30 @@ export function useLoanPaymentAttachmentCounts(loanPaymentIds) {
   })
 }
 
+// Returns all attachments across multiple loan IDs (for the borrower files section)
+export function useAllLoanAttachments(loanIds) {
+  return useQuery({
+    queryKey: ['all-loan-attachments', loanIds],
+    enabled: Array.isArray(loanIds) && loanIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('loan_attachments')
+        .select('*')
+        .in('loan_id', loanIds)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return Promise.all(
+        data.map(async (att) => {
+          const { data: urlData } = await supabase.storage
+            .from('attachments')
+            .createSignedUrl(att.file_path, 3600)
+          return { ...att, signedUrl: urlData?.signedUrl || null }
+        })
+      )
+    },
+  })
+}
+
 // --- Single-entity queries (for modal content) ---
 
 // Returns attachment rows with signedUrl for a single transaction
@@ -252,7 +276,7 @@ export function useUploadAttachment() {
     onSuccess: ({ entityType, entityId }) => {
       const keyMap = {
         transaction: [['transaction-attachments', entityId], ['transaction-attachment-counts']],
-        loan: [['loan-attachments', entityId], ['loan-attachment-counts']],
+        loan: [['loan-attachments', entityId], ['loan-attachment-counts'], ['all-loan-attachments']],
         payment: [['payment-attachments', entityId], ['payment-attachment-counts']],
         loan_payment: [['loan-payment-attachments', entityId], ['loan-payment-attachment-counts']],
       }
@@ -282,7 +306,7 @@ export function useDeleteAttachment() {
     onSuccess: ({ entityType, entityId }) => {
       const keyMap = {
         transaction: [['transaction-attachments', entityId], ['transaction-attachment-counts']],
-        loan: [['loan-attachments', entityId], ['loan-attachment-counts']],
+        loan: [['loan-attachments', entityId], ['loan-attachment-counts'], ['all-loan-attachments']],
         payment: [['payment-attachments', entityId], ['payment-attachment-counts']],
         loan_payment: [['loan-payment-attachments', entityId], ['loan-payment-attachment-counts']],
       }

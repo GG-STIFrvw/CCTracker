@@ -1,12 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { getLoanTotalPaid, getLoanRemaining, isLoanOverdue } from '../../utils/loans.js'
 import { computeOutstanding } from '../../utils/loanInterest.js'
 import { formatPeso } from '../../utils/money.js'
-import { useLoanAttachmentCounts } from '../../hooks/useAttachments.js'
-import AttachmentModal from '../ui/AttachmentModal.jsx'
 import EditRateModal from './EditRateModal.jsx'
 import LedgerStatementModal from './LedgerStatementModal.jsx'
-import { AttachmentIcon } from '../ui/icons.jsx'
+import { SettingsIcon, LedgerIcon } from '../ui/icons.jsx'
 
 const STATUS_STYLES = {
   active: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
@@ -22,13 +20,9 @@ function progressBarColor(pct) {
   return 'bg-red-400'
 }
 
-export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }) {
-  const [attachingLoanId, setAttachingLoanId] = useState(null)
+export default function LoanTable({ loans, onPay, readOnly = false }) {
   const [editingRateLoan, setEditingRateLoan] = useState(null)
   const [statementLoan, setStatementLoan] = useState(null)
-
-  const loanIds = useMemo(() => loans.map((l) => l.id), [loans])
-  const { data: attCounts = {} } = useLoanAttachmentCounts(loanIds)
 
   if (loans.length === 0) {
     return <p className="text-gray-400 text-center py-10 text-sm">No loans yet. Click "+ Add Loan" to get started.</p>
@@ -49,7 +43,6 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
               <th className="px-4 py-3 text-right">Total Owed</th>
               <th className="px-4 py-3 text-left">Next Payment</th>
               <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-center">Files</th>
               <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -79,7 +72,6 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
               const statusKey = overdue ? 'overdue' : loan.status
               const statusLabel = overdue ? 'Overdue' : loan.status.charAt(0).toUpperCase() + loan.status.slice(1)
               const pct = loan.amount > 0 ? Math.min(((loan.amount - principalBalance) / loan.amount) * 100, 100) : 0
-              const count = attCounts[loan.id] || 0
 
               return (
                 <tr key={loan.id} className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50">
@@ -120,17 +112,6 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                   <td className="px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[statusKey]}`}>{statusLabel}</span>
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    {(!readOnly || count > 0) && (
-                      <button onClick={() => setAttachingLoanId(loan.id)}
-                        className="inline-flex items-center gap-1 text-gray-400 hover:text-[#2D6A4F] dark:hover:text-[#9FE870] transition-colors text-xs" title="Attachments">
-                        <AttachmentIcon className="w-4 h-4" />
-                        {count > 0 && (
-                          <span className="bg-[#9FE870]/20 text-[#2D6A4F] dark:text-[#9FE870] text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">{count}</span>
-                        )}
-                      </button>
-                    )}
-                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       {!readOnly && loan.status !== 'completed' && loan.status !== 'defaulted' && (
@@ -143,13 +124,13 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                         <>
                           {loan.status !== 'completed' && loan.status !== 'defaulted' && (
                             <button onClick={() => setEditingRateLoan(loan)}
-                              className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs transition-colors" title="Edit interest rate">
-                              ⚙
+                              className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" title="Edit interest rate">
+                              <SettingsIcon className="w-4 h-4" />
                             </button>
                           )}
                           <button onClick={() => setStatementLoan(loan)}
-                            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs transition-colors" title="View statement">
-                            📄
+                            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" title="View statement">
+                            <LedgerIcon className="w-4 h-4" />
                           </button>
                         </>
                       )}
@@ -162,9 +143,6 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
         </table>
       </div>
 
-      {attachingLoanId && (
-        <AttachmentModal entityType="loan" entityId={attachingLoanId} borrowerId={borrowerId} readOnly={readOnly} onClose={() => setAttachingLoanId(null)} />
-      )}
       {editingRateLoan && (
         <EditRateModal loan={editingRateLoan} onClose={() => setEditingRateLoan(null)} onSuccess={() => setEditingRateLoan(null)} />
       )}

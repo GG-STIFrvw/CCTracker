@@ -5,8 +5,10 @@ import { useLoans } from '../hooks/useLoans.js'
 import { useSharedBorrowerInfo } from '../hooks/useBorrowerShares.js'
 import { getLoanInitials, getLoanTotalPaid, getLoanRemaining } from '../utils/loans.js'
 import { formatPeso, addMoney } from '../utils/money.js'
+import { computeOutstanding } from '../utils/loanInterest.js'
 import Navbar from '../components/layout/Navbar.jsx'
 import LoanTable from '../components/borrowers/LoanTable.jsx'
+import LoanFilesSection from '../components/borrowers/LoanFilesSection.jsx'
 import LoanForm from '../components/borrowers/LoanForm.jsx'
 import LoanPaymentModal from '../components/borrowers/LoanPaymentModal.jsx'
 import BorrowerShareModal from '../components/borrowers/BorrowerShareModal.jsx'
@@ -73,11 +75,31 @@ export default function LoanPage() {
 
   if (!borrower) return null
 
-  const totalLoaned = loans.reduce((sum, l) => addMoney(sum, l.amount), 0)
-  const totalPaid = loans.reduce((sum, l) => addMoney(sum, getLoanTotalPaid(l.loan_payments)), 0)
-  const outstanding = loans.reduce(
-    (sum, l) => addMoney(sum, getLoanRemaining(l.amount, getLoanTotalPaid(l.loan_payments))),
-    0
+  const { totalLoaned, totalPaid, outstanding, totalDue } = loans.reduce(
+    (acc, l) => {
+      if (l.interest_bearing) {
+        const out = computeOutstanding(l.amount, l._ledger ?? [])
+        const paid = (l._ledger ?? [])
+          .filter((e) => e.entry_type === 'payment')
+          .reduce((s, e) => s + Number(e.amount), 0)
+        return {
+          totalLoaned: addMoney(acc.totalLoaned, l.amount),
+          totalPaid: addMoney(acc.totalPaid, paid),
+          outstanding: addMoney(acc.outstanding, out.principalBalance),
+          totalDue: addMoney(acc.totalDue, out.total),
+        }
+      } else {
+        const paid = getLoanTotalPaid(l.loan_payments)
+        const remaining = getLoanRemaining(l.amount, paid)
+        return {
+          totalLoaned: addMoney(acc.totalLoaned, l.amount),
+          totalPaid: addMoney(acc.totalPaid, paid),
+          outstanding: addMoney(acc.outstanding, remaining),
+          totalDue: addMoney(acc.totalDue, remaining),
+        }
+      }
+    },
+    { totalLoaned: 0, totalPaid: 0, outstanding: 0, totalDue: 0 }
   )
 
   const initials = getLoanInitials(borrower.full_name)
@@ -104,7 +126,7 @@ export default function LoanPage() {
               <p className="text-gray-400 text-xs mt-0.5">{borrower.address}</p>
             )}
           </div>
-          <div className="grid grid-cols-3 gap-6 text-center sm:text-right">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center sm:text-right">
             <div>
               <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Total Loaned</p>
               <p className="text-gray-900 dark:text-white font-black font-mono text-lg">{formatPeso(totalLoaned)}</p>
@@ -115,7 +137,11 @@ export default function LoanPage() {
             </div>
             <div>
               <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Outstanding</p>
-              <p className="text-red-500 dark:text-red-400 font-black font-mono text-lg">{formatPeso(outstanding)}</p>
+              <p className="text-gray-700 dark:text-gray-300 font-black font-mono text-lg">{formatPeso(outstanding)}</p>
+            </div>
+            <div>
+              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">Total Due</p>
+              <p className="text-red-500 dark:text-red-400 font-black font-mono text-lg">{formatPeso(totalDue)}</p>
             </div>
           </div>
         </div>
@@ -158,7 +184,10 @@ export default function LoanPage() {
         {isLoading ? (
           <p className="text-gray-500 text-center py-10">Loading loans…</p>
         ) : (
-          <LoanTable loans={loans} onPay={setPayingLoan} readOnly={readOnly} borrowerId={borrowerId} />
+          <>
+            <LoanTable loans={loans} onPay={setPayingLoan} readOnly={readOnly} />
+            <LoanFilesSection loans={loans} borrowerId={borrowerId} readOnly={readOnly} />
+          </>
         )}
       </main>
 
