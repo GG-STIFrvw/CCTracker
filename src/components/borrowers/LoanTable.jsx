@@ -87,11 +87,14 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{loan.description || '—'}</p>
                       {loan.notarized && <p className="text-gray-400 text-xs mt-0.5">Notarized</p>}
-                      {loan.interest_bearing && loan._rates?.length > 0 && (
-                        <p className="text-[#9FE870] text-xs mt-0.5">
-                          {loan._rates.at(-1).interest_rate}%/mo · {loan._rates.at(-1).interest_type === 'simple' ? 'Simple' : 'Diminishing'}
-                        </p>
-                      )}
+                      {loan.interest_bearing && loan._rates?.length > 0 && (() => {
+                        const currentRate = [...loan._rates].sort((a, b) => b.effective_from.localeCompare(a.effective_from))[0]
+                        return (
+                          <p className="text-[#9FE870] text-xs mt-0.5">
+                            {currentRate.interest_rate}%/mo · {currentRate.interest_type === 'simple' ? 'Simple' : 'Diminishing'}
+                          </p>
+                        )
+                      })()}
                       <div className="mt-1.5 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full w-32 overflow-hidden">
                         <div className={`h-full rounded-full ${progressBarColor(pct)}`} style={{ width: `${pct}%` }} />
                       </div>
@@ -138,10 +141,12 @@ export default function LoanTable({ loans, onPay, readOnly = false, borrowerId }
                       )}
                       {!readOnly && loan.interest_bearing && (
                         <>
-                          <button onClick={() => setEditingRateLoan(loan)}
-                            className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs transition-colors" title="Edit interest rate">
-                            ⚙
-                          </button>
+                          {loan.status !== 'completed' && loan.status !== 'defaulted' && (
+                            <button onClick={() => setEditingRateLoan(loan)}
+                              className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs transition-colors" title="Edit interest rate">
+                              ⚙
+                            </button>
+                          )}
                           <button onClick={() => setStatementLoan(loan)}
                             className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xs transition-colors" title="View statement">
                             📄
