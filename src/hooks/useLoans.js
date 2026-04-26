@@ -78,7 +78,7 @@ export function useLoans(borrowerId) {
 export function useAddLoan() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ borrowerId, loanData }) => {
+    mutationFn: async ({ borrowerId, loanData, historicalPayments = [] }) => {
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -107,7 +107,7 @@ export function useAddLoan() {
         .single()
       if (error) throw error
 
-      if (interest_bearing && interest_rate && interest_type) {
+      if (interest_bearing && interest_rate != null && interest_type) {
         const { error: rateErr } = await supabase.from('loan_interest_rates').insert({
           loan_id: data.id,
           user_id: user.id,
@@ -119,6 +119,30 @@ export function useAddLoan() {
           effective_from: rest.loan_date,
         })
         if (rateErr) throw rateErr
+      }
+
+      // Insert historical payments before the query fires so generateMissingEntries
+      // sees them and correctly skips penalties for months that were already paid.
+      // At this point no charges exist yet, so the full amount applies to principal.
+      if (interest_bearing && historicalPayments.length > 0) {
+        const sorted = [...historicalPayments].sort((a, b) =>
+          a.period_date.localeCompare(b.period_date)
+        )
+        for (const payment of sorted) {
+          const { error: payErr } = await supabase.from('loan_ledger').insert({
+            loan_id: data.id,
+            user_id: user.id,
+            entry_type: 'payment',
+            amount: payment.amount,
+            principal_applied: payment.amount,
+            interest_applied: 0,
+            penalty_applied: 0,
+            period_date: payment.period_date,
+            is_manual: true,
+            notes: 'Historical payment',
+          })
+          if (payErr) throw payErr
+        }
       }
 
       return data

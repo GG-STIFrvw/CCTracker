@@ -94,7 +94,9 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
   if (!loan.next_payment_date) return []
 
   const chargedPeriods = new Set(
-    ledgerEntries.filter(e => e.entry_type === 'interest_charge').map(e => e.period_date)
+    ledgerEntries
+      .filter(e => e.entry_type === 'interest_charge' || e.entry_type === 'late_fee' || e.entry_type === 'penalty_interest')
+      .map(e => e.period_date)
   )
 
   const result = []
@@ -125,8 +127,10 @@ export function generateMissingEntries(loan, rateHistory, ledgerEntries, today) 
           is_manual: false,
           notes: null,
         }
-        result.push(interestEntry)
-        workingLedger.push(interestEntry)
+        if (interestAmount > 0) {
+          result.push(interestEntry)
+          workingLedger.push(interestEntry)
+        }
 
         const paid = isPeriodSufficientlyPaid(currentDueDate, workingLedger, loan.minimum_payment)
         if (!paid) {

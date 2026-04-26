@@ -1,7 +1,9 @@
+import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loanSchema } from '../../lib/zod-schemas.js'
 import { useAddLoan } from '../../hooks/useLoans.js'
+import { advanceNextPaymentDate } from '../../utils/loans.js'
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
 
@@ -12,6 +14,8 @@ const INPUT_CLS =
 
 export default function LoanForm({ borrowerId, onClose, onSuccess }) {
   const addLoan = useAddLoan()
+  const [historicalAmounts, setHistoricalAmounts] = useState({})
+
   const {
     register,
     handleSubmit,
@@ -42,6 +46,28 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
   const frequency = watch('payment_frequency')
   const notarized = watch('notarized')
   const interestBearing = watch('interest_bearing')
+  const nextPaymentDate = watch('next_payment_date')
+  const paymentDay = watch('payment_day')
+
+  // Compute past due dates for backdated loans so we can pre-record payments
+  const pastPeriods = useMemo(() => {
+    if (!interestBearing || !nextPaymentDate || nextPaymentDate >= today) return []
+    if (frequency === 'one-time') return []
+
+    const periods = []
+    let current = nextPaymentDate
+    while (current <= today) {
+      periods.push(current)
+      const next = advanceNextPaymentDate({
+        payment_frequency: frequency,
+        next_payment_date: current,
+        payment_day: frequency === 'monthly' ? Number(paymentDay) || 30 : null,
+      })
+      if (!next || next === current) break
+      current = next
+    }
+    return periods
+  }, [interestBearing, nextPaymentDate, frequency, paymentDay])
 
   async function onSubmit(values) {
     try {
@@ -58,7 +84,12 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
         late_fee_rate: values.interest_bearing ? Number(values.late_fee_rate) : null,
         penalty_rate: values.interest_bearing ? Number(values.penalty_rate) : null,
       }
-      await addLoan.mutateAsync({ borrowerId, loanData })
+
+      const historicalPayments = pastPeriods
+        .filter((period) => Number(historicalAmounts[period]) > 0)
+        .map((period) => ({ period_date: period, amount: Number(historicalAmounts[period]) }))
+
+      await addLoan.mutateAsync({ borrowerId, loanData, historicalPayments })
       onSuccess?.()
       onClose()
     } catch (err) {
@@ -175,7 +206,7 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5">
                   Interest Rate (%/month)
                 </label>
-                <input {...register('interest_rate')} type="number" step="0.01" placeholder="4.00" className={INPUT_CLS} />
+                <input {...register('interest_rate')} type="number" step="0.01" placeholder="0 = penalties only, e.g. 4" className={INPUT_CLS} />
                 {errors.interest_rate && <p className="text-red-500 text-xs mt-1">{errors.interest_rate.message}</p>}
               </div>
               <div>
@@ -209,6 +240,33 @@ export default function LoanForm({ borrowerId, onClose, onSuccess }) {
                 If set, partial payments below this amount still trigger late fees.
               </p>
             </div>
+
+            {/* Historical payments — only shown for backdated loans */}
+            {pastPeriods.length > 0 && (
+              <div className="border-t border-amber-200 dark:border-amber-700 pt-3 space-y-2">
+                <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                  Historical Payments
+                </p>
+                <p className="text-xs text-gray-400">
+                  This loan has past due dates. Enter payments already made so penalties are not wrongly generated. Leave blank for missed months.
+                </p>
+                {pastPeriods.map((period) => (
+                  <div key={period} className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-gray-500 w-24 shrink-0">{period}</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Amount paid (blank = missed)"
+                      value={historicalAmounts[period] ?? ''}
+                      onChange={(e) =>
+                        setHistoricalAmounts((prev) => ({ ...prev, [period]: e.target.value }))
+                      }
+                      className={INPUT_CLS}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

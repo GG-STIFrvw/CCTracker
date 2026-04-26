@@ -72,7 +72,7 @@ export const loanSchema = z
     // Interest fields
     interest_bearing: z.boolean().default(false),
     minimum_payment: z.coerce.number().positive().optional().nullable(),
-    interest_rate: z.coerce.number().positive().optional().nullable(),
+    interest_rate: z.coerce.number().min(0).optional().nullable(),
     interest_type: z.enum(['simple', 'diminishing']).optional().nullable(),
     late_fee_rate: z.coerce.number().min(0).optional().nullable(),
     penalty_rate: z.coerce.number().min(0).optional().nullable(),
@@ -98,7 +98,7 @@ export const loanSchema = z
   .refine(
     (d) => {
       if (d.interest_bearing) {
-        return !!d.interest_rate && !!d.interest_type
+        return d.interest_rate != null && !!d.interest_type
       }
       return true
     },
@@ -142,7 +142,7 @@ export const billingCycleSchema = z.object({
 export const loanInterestRateSchema = z.object({
   interest_rate: z.coerce
     .number({ invalid_type_error: 'Must be a number' })
-    .positive('Interest rate must be greater than 0'),
+    .min(0, 'Must be 0 or greater'),
   interest_type: z.enum(['simple', 'diminishing'], { required_error: 'Interest type is required' }),
   late_fee_rate: z.coerce.number().min(0, 'Must be 0 or greater'),
   penalty_rate: z.coerce.number().min(0, 'Must be 0 or greater'),

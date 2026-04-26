@@ -22,6 +22,7 @@ export default function LedgerStatementModal({ loan, onClose }) {
   const [waivingEntry, setWaivingEntry] = useState(null)
   const [waiveAmount, setWaiveAmount] = useState('')
   const [waiveNotes, setWaiveNotes] = useState('')
+  const [waivedEntryIds, setWaivedEntryIds] = useState(new Set())
 
   // Rate change informational rows from _rates
   const rateRows = useMemo(
@@ -38,7 +39,9 @@ export default function LedgerStatementModal({ loan, onClose }) {
   const allRows = useMemo(() => {
     return [
       { type: 'disbursement', date: loan.loan_date, amount: loan.amount },
-      ...ledger.map((e) => ({ type: 'ledger', entry: e, date: e.period_date })),
+      ...ledger
+      .filter((e) => !(e.entry_type === 'interest_charge' && Number(e.amount) === 0))
+      .map((e) => ({ type: 'ledger', entry: e, date: e.period_date })),
       ...rateRows,
     ].sort((a, b) => a.date.localeCompare(b.date))
   }, [ledger, rateRows, loan])
@@ -71,6 +74,7 @@ export default function LedgerStatementModal({ loan, onClose }) {
     if (!waivingEntry || amt <= 0) return
     try {
       await waivePenalty.mutateAsync({ loan, amount: amt, notes: waiveNotes || null })
+      setWaivedEntryIds((prev) => new Set([...prev, waivingEntry.id]))
       setWaivingEntry(null)
       setWaiveAmount('')
       setWaiveNotes('')
@@ -176,12 +180,15 @@ export default function LedgerStatementModal({ loan, onClose }) {
                     </td>
                     <td className="px-3 py-2 text-right font-mono text-gray-900 dark:text-white">{formatPeso(row.balance)}</td>
                     <td className="px-3 py-2">
-                      {isPenalty && outstanding.penaltyBalance > 0 && (
+                      {isPenalty && outstanding.penaltyBalance > 0 && !waivedEntryIds.has(e.id) && (
                         <button
                           onClick={() => { setWaivingEntry(e); setWaiveAmount(String(e.amount)) }}
                           className="text-xs text-amber-500 hover:text-amber-700 transition-colors">
                           Waive
                         </button>
+                      )}
+                      {isPenalty && waivedEntryIds.has(e.id) && (
+                        <span className="text-xs text-emerald-500">Waived</span>
                       )}
                     </td>
                   </tr>
